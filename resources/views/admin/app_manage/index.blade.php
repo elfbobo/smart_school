@@ -182,6 +182,7 @@
                             </td>
                             <td class="text-center">
                                 <button class="btn btn-custom btn-sm btn-icon" onclick="openIframe('编辑', '{{ route('app_manage.edit', ['id' => $item['id']]) }}')"><i class="fa fa-pencil"></i></button>
+                                <button class="btn btn-success btn-sm btn-icon" onclick="openIframe('授权', '{{ route('app_manage.auth', ['id' => $item['id']]) }}')"><i class="fa fa-lock"></i></button>
                                 <button class="btn btn-danger btn-sm btn-icon" onclick="removeOne('{{ route('app_manage.destroy', ['id' => $item['id']]) }}')"><i class="fa fa-times"></i></button>
                             </td>
                         </tr>

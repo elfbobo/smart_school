@@ -36,7 +36,7 @@
     </div>--}}
     <!-- end row -->
 
-    <div class="row">
+    {{--<div class="row">
         <div class="col-lg-4">
             <div class="card-box">
                 <h4 class="header-title">本月节目数（单位：条）</h4>
@@ -66,7 +66,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                        {{--@if($data->isNotEmpty())
+                        --}}{{--@if($data->isNotEmpty())
                             @foreach($data as $item)
                             <tr>
                                 <td data-toggle="tooltip"
@@ -78,17 +78,17 @@
                                 <td>{{ $item->total_score }}</td>
                             </tr>
                             @endforeach
-                        @endif--}}
+                        @endif--}}{{--
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-    </div>
+    </div>--}}
     <!-- end row -->
 
 
-    <div class="row">
+    {{--<div class="row">
 
         <div class="col-lg-6">
 
@@ -109,7 +109,7 @@
             </div>
         </div>
 
-    </div>
+    </div>--}}
     <!-- end row -->
 @endsection
 @section('before-js')

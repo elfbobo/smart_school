@@ -237,7 +237,7 @@
         $(document).ready(function() {
             Parsley.on('form:submit', function(e) {
                 var formData = $('form').serializeObject();
-                return postFormData(formData, '{{ route('app_manage.store') }}')
+                return postFormData(formData, '{{ route('app_manage.store') }}', 'post', true)
             });
 
 
@@ -277,10 +277,27 @@
         //年月日时分秒
         jeDate("#begin-end-time",{
             range:"~",
-            minDate:"1900-01-01 00:00:00",
-            maxDate:"2099-12-31 23:59:59",
-            format: 'YYYY-MM-DD hh:mm:ss',
+            minDate:"1900-01-01",
+            maxDate:"2099-12-31",
+            format: 'YYYY-MM-DD',
             multiPane: false,
+        });
+
+        //多选框
+        $("#my-select").bootstrapDualListbox({
+            nonSelectedListLabel: false,
+            selectedListLabel: false,
+            filterTextClear: '全部',
+            filterPlaceHolder: '过滤条件',
+            preserveSelectionOnMove: 'moved',
+            moveOnSelect: false,
+            moveAllLabel: '添加全部',
+            moveSelectedLabel: '添加选中',
+            removeAllLabel: '移除全部',
+            removeSelectedLabel: '移除选中',
+            infoText: '选中/未选中共 {0} 项',
+            infoTextFiltered: '从 {1} 项 筛选 {0} 项',
+            infoTextEmpty: '空',
         });
     </script>
 @endsection

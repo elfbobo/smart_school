@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Libs\PHPTree;
 use App\Models\Admin\AppListModel;
+use App\Models\Admin\AppRoleModel;
+use App\Models\Admin\AppServiceModel;
+use App\Models\Admin\RoleModel;
 use App\Models\Admin\ServiceTypeModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -199,6 +203,88 @@ class AppManageController extends BaseController
             return $this->responseToJson([], '删除失败', 0);
         }
         return $this->responseToJson([], '删除成功');
+    }
+
+    public function auth(Request $request)
+    {
+        $id = $request->get('id', null);
+        if ($request->isMethod('post')) {
+            $serviceType = $request->service_type ?: [];
+            $appRoles = $request->app_role ?: [];
+            $serviceIds = AppServiceModel::where('app_id', $id)
+                ->where('state', 0)
+                ->pluck('service_type_id')
+                ->toArray();
+            $approleIds = AppRoleModel::where('app_id', $id)
+                ->where('state', 0)
+                ->pluck('role_id')
+                ->toArray();
+            $diffTypeIds = array_diff($serviceIds, $serviceType); //待删除的
+            $diffRoleIds = array_diff($approleIds, $appRoles);
+            DB::beginTransaction();
+            try {
+                if ($serviceType) {
+                    foreach ($serviceType as $type) {
+                        AppServiceModel::updateOrCreate([
+                            'app_id' => $id,
+                            'service_type_id' => $type,
+                            'state' => 0,
+                        ], [
+                            'app_id' => $id,
+                            'service_type_id' => $type
+                        ]);
+                    }
+                }
+
+                if ($appRoles) {
+                    foreach ($appRoles as $role_id) {
+                        AppRoleModel::updateOrCreate([
+                            'app_id' => $id,
+                            'role_id' => $role_id,
+                            'state' => 0,
+                        ], [
+                            'app_id' => $id,
+                            'role_id' => $role_id,
+                        ]);
+                    }
+                }
+
+                if ($diffTypeIds) {
+                    AppServiceModel::whereIn('service_type_id', $diffTypeIds)
+                        ->where('app_id', $id)
+                        ->delete();
+                }
+
+                if ($diffRoleIds) {
+                    AppRoleModel::whereIn('role_id', $diffRoleIds)
+                        ->where('app_id', $id)
+                        ->delete();
+                }
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return $this->responseToJson([], '保存失败' . $e->getMessage(), 201);
+            }
+
+            return $this->responseToJson([], '保存成功');
+        }
+        $serviceType = ServiceTypeModel::where('state', 0)
+            ->orderBy('disp_order', 'desc')
+            ->select('id', 'parent_id as pid', 'name as title')
+            ->get()
+            ->toArray();
+        $serviceType = PHPTree::toLayer($serviceType);
+        $roles = RoleModel::get();
+        $serviceTypeIds = AppServiceModel::where('app_id', $id)->where('state', 0)->pluck('service_type_id')->toArray();
+        $appRoleIds = AppRoleModel::where('app_id', $id)->where('state', 0)->pluck('role_id')->toArray();
+        return view('admin.app_manage.auth', [
+            'serviceType' => $serviceType,
+            'roles' => $roles,
+            'id' => $id,
+            'serviceTypeIds' => $serviceTypeIds,
+            'appRoleIds' => $appRoleIds,
+        ]);
     }
 
     private function validation($data, $id = null)

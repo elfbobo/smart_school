@@ -9,6 +9,7 @@ class AppListModel extends Model
     //
     protected $table = 't_app_list';
     protected $fillable = [
+        'id',
         'name',
         'icon_url',
         'description',

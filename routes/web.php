@@ -76,6 +76,8 @@ Route::group(['namespace' => 'Admin'], function() {
             //应用管理
             Route::group(['prefix' => 'app'], function () {
                 //应用管理
+                Route::get('app_manage/auth', 'AppManageController@auth')->name('app_manage.auth');
+                Route::post('app_manage/auth', 'AppManageController@auth')->name('app_manage.auth');
                 Route::resource('app_manage', 'AppManageController');
                 Route::delete('app_manage/delete', 'AppManageController@destroy')->name('app_manage.destroy');
 
