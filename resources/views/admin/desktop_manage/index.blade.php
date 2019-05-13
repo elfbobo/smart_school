@@ -1,5 +1,5 @@
 @extends('admin.layout.app')
-@section('title', '应用管理')
+@section('title', '桌面模板管理')
 @section('css')
     <!--Footable-->
     <link href="{{ asset('plugins/footable/css/footable.core.css') }}" rel="stylesheet">
@@ -11,9 +11,9 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="card-box">
-                <h4 class="m-t-0 header-title">应用管理</h4>
+                <h4 class="m-t-0 header-title">桌面模板管理</h4>
                 <p class="text-muted m-b-30 font-13">
-                    应用列表
+                    桌面列表
                 </p>
 
                 <div class="mb-3">
@@ -23,17 +23,17 @@
                                 <button class="btn btn-success" onclick="openIframe('导入', '{{ route('user.import') }}')"><i class="fa fa-plus mr-2"></i> 导入</button>
                             </div>--}}
                             <div class="form-group mr-2">
-                                <button class="btn btn-primary" onclick="openIframe('新增', '{{ route('app_manage.create') }}')"><i class="fa fa-plus mr-2"></i> 新增</button>
+                                <button class="btn btn-primary" onclick="openIframe('新增', '{{ route('desktop_manage.create') }}')"><i class="fa fa-plus mr-2"></i> 新增</button>
                             </div>
-                            <div class="form-group mr-2">
+                            {{--<div class="form-group mr-2">
                                 <button class="btn btn-danger" onclick="removeAll('{{ route('app_manage.destroy') }}')"><i class="fa fa-times mr-2"></i> 删除</button>
-                            </div>
+                            </div>--}}
                             <form class="form-inline" id="search-form">
 
                                 <div class="form-group mr-2">
                                     <input  type="text" name="search"
                                             value="{{ request('search') }}"
-                                            placeholder="应用名称" class="form-control" autocomplete="off">
+                                            placeholder="桌面名称" class="form-control" autocomplete="off">
                                 </div>
                                 <div class="form-group mr-2">
                                     <button class="btn btn-primary "><i class="fa fa-search mr-2"></i> 搜索</button>
@@ -41,67 +41,9 @@
                             </form>
                         </div>
                     </div>
-                    <div class="row" style="margin-top: 15px;">
-                        <div class="col-12">
-                            <div class="col-12 text-sm-center form-inline" style="padding-left: 0;">
-                                <div class="form-group mr-5">
-                                    <select name="app_type" id="" class="form-control" onchange="searchValue(this.value, 'app_type')">
-                                        <option value="">应用类型</option>
-                                        @foreach($app_type as $k => $v)
-                                        <option value="{{ $k }}" {{ !is_null(request('app_type')) && request('app_type') == $k ? 'selected' : '' }}>{{ $v }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="form-group mr-5">
-                                    <select name="app_attr" id="" class="form-control" onchange="searchValue(this.value, 'app_attr')">
-                                        <option value="">应用属性</option>
-                                        @foreach($app_attr as $k => $v)
-                                        <option value="{{ $k }}" {{ request('app_attr') == $k ? 'selected' : '' }}>{{ $v }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="form-group mr-5">
-                                    <select name="status" id="" class="form-control" onchange="searchValue(this.value, 'status')">
-                                        <option value="">运行状态</option>
-                                        @foreach($status as $k => $v)
-                                        <option value="{{ $k }}" {{ !is_null(request('status')) && request('status') == $k ? 'selected' : '' }}>{{ $v }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="form-group mr-5">
-                                    <select name="is_cycle" id="" class="form-control" onchange="searchValue(this.value, 'is_cycle')">
-                                        <option value="">周期服务</option>
-                                        @foreach($is_cycle as $k => $v)
-                                        <option value="{{ $k }}" {{ !is_null(request('is_cycle')) && request('is_cycle') == $k ? 'selected' : '' }}>{{ $v }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="form-group mr-5">
-                                    <select name="service_type" id="" class="form-control" onchange="searchValue(this.value, 'service_type')">
-                                        <option value="">服务类别</option>
-                                        @if(!empty($service_type))
-                                            @foreach($service_type as $item)
-                                                <option value="{{ $item['id'] }}">{{ $item['title_display'] }}</option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <select name="business" id="" class="form-control" onchange="searchValue(this.value, 'business')">
-                                        <option value="">业务域</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                <table {{--id="demo-foo-addrow"--}} class="table table-striped table-bordered m-b-0 toggle-circle" data-page-size="100000">
+                {{--<table class="table table-striped table-bordered m-b-0 toggle-circle">
                     <thead>
                     <tr>
                         <th style="text-align: center;">
@@ -114,8 +56,8 @@
                         <th data-sort-ignore="true">应用类型</th>
                         <th data-sort-ignore="true">应用名称</th>
                         <th data-sort-ignore="true">周期服务</th>
-                        {{--<th data-sort-ignore="true">PC应用</th>
-                        <th data-sort-ignore="true">移动应用</th>--}}
+                        --}}{{--<th data-sort-ignore="true">PC应用</th>
+                        <th data-sort-ignore="true">移动应用</th>--}}{{--
                         <th data-sort-ignore="true">推荐应用</th>
                         <th data-sort-ignore="true">业务域</th>
                         <th data-sort-ignore="true">上线状态</th>
@@ -145,20 +87,20 @@
                                     <label class="badge badge-info">否</label>
                                 @endif
                             </td>
-                            {{--<td>
+                            --}}{{--<td>
                                 @if($item->is_pc_app)
                                     <label class="badge badge-custom">是</label>
                                 @else
                                     <label class="badge badge-info">否</label>
                                 @endif
-                            </td>--}}
-                            {{--<td>
+                            </td>--}}{{--
+                            --}}{{--<td>
                                 @if($item->is_mobile_app)
                                     <label class="badge badge-custom">是</label>
                                 @else
                                     <label class="badge badge-info">否</label>
                                 @endif
-                            </td>--}}
+                            </td>--}}{{--
                             <td>
                                 @if($item->is_recommended)
                                     <label class="badge badge-custom">是</label>
@@ -217,7 +159,7 @@
                         </tr>
                         </tfoot>
                     @endif
-                </table>
+                </table>--}}
             </div>
         </div>
     </div>
@@ -232,7 +174,7 @@
     <script>
         function searchValue(value, key)
         {
-            var params = {!! $buildParams !!};
+            var params = {!! $buildParams ?? '' !!};
             if ('undefined' !== params[key]) {
                 params[key] = value;
             }

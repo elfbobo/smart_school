@@ -40,6 +40,9 @@ Route::group(['namespace' => 'Admin'], function() {
         Route::get('get-team-group-option', 'AjaxController@getTeamGroupOption')->name('get-team-group-option');
         Route::match(['get', 'post'],'profile', 'ProfileController@index')->name('user.profile');
 
+        //选择app应用列表展示
+        Route::get('get-app-list', 'DesktopManageController@getApplist');
+
         //检查权限
         Route::group(['middleware' => 'checkauth'], function () {
             Route::get('/', 'IndexController@index')->name('home.index');
@@ -84,6 +87,9 @@ Route::group(['namespace' => 'Admin'], function() {
                 //服务类别
                 Route::post('service_type/save-node', 'ServiceTypeController@saveNode')->name('service_type.save-node');
                 Route::resource('service_type', 'ServiceTypeController');
+
+                //桌面模板管理
+                Route::resource('desktop_manage', 'DesktopManageController');
             });
         });
     });

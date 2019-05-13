@@ -63,7 +63,10 @@ class AppManageController extends BaseController
         //
         $requestParams = $request->all();
         $perPage = $request->get('perpage', config('custom.perPage'));
-        $data = AppListModel::where(function ($query) use ($requestParams) {
+        $data = AppListModel::from('t_app_list as a')
+            //->join('t_app_service_app as b', 'b.app_id', '=', 'a.id')
+            //->leftJoin('t_service_type as c', 'c.id', 'b.service_type_id')
+            ->where(function ($query) use ($requestParams) {
             //关键字搜索
             if (isset($requestParams['search']) && $requestParams['search']) {
                 $query->where('name', 'like', '%' . $requestParams['search'] . '%');
@@ -90,7 +93,18 @@ class AppManageController extends BaseController
             if (isset($requestParams['is_cycle']) && !is_null($requestParams['is_cycle'] != '')) {
                 $query->where('is_cycle', $requestParams['is_cycle']);
             }
+
+            //服务类别搜索
+            /*if (isset($requestParams['service_type']) && $requestParams['service_type']) {
+                $child = ServiceTypeModel::where('parent_id', $requestParams['service_type'])->pluck('id')->toArray();
+                $serviceTypeIds = [$requestParams['service_type']];
+                if ($child) {
+                    $serviceTypeIds = array_merge($serviceTypeIds, $child);
+                }
+                $query->whereIn('b.service_type_id', $serviceTypeIds);
+            }*/
         })
+            //->select('a.*', 'c.name as service_name')
             ->paginate($perPage);
         $service_type = ServiceTypeModel::where('state', 0)->select('id', 'parent_id as pid', 'name as title')->get()->toArray();
         $service_type = PHPTree::toList($service_type);

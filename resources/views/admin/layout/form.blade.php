@@ -17,6 +17,9 @@
     <link href="{{ asset('plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('plugins/jeDate/skin/jedate.css') }}" rel="stylesheet" type="text/css" />
 
+    <!-- jquery UI -->
+    <link href="{{ asset('plugins/jquery-ui/jquery-ui.min.css') }}" rel="stylesheet" type="text/css" />
+
 @yield('css')
 <!-- App css -->
     <link href="{{ asset('assets/admin/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
@@ -53,6 +56,9 @@
 <script type="text/javascript" src="{{ asset('plugins/parsleyjs/dist/parsley.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('plugins/parsleyjs/src/i18n/zh_cn.js') }}"></script>
 <script type="text/javascript" src="{{ asset('plugins/jeDate/dist/jedate.min.js') }}"></script>
+
+<!-- Jquery Ui js -->
+<script src="{{ asset('plugins/jquery-ui/jquery-ui.min.js') }}"></script>
 
 @yield('before-js')
 
