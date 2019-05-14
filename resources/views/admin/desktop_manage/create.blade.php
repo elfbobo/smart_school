@@ -29,6 +29,12 @@
                     </div>
                     <div class="form-group">
                         <label for="">选择角色</label>
+                        <br>
+                        <select name="role_ids[]" id="my-select" multiple>
+                            @foreach($roles as $k => $role)
+                                <option value="{{ $k }}">{{ $role }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -65,10 +71,25 @@
                 }
                 var formData = $('form').serializeObject();
                 formData['app_ids'] = JSON.stringify(app_ids);
-                console.log(formData);return false;
                 return postFormData(formData, '{{ route('desktop_manage.store') }}', 'post', true)
             });
 
+            //多选框
+            $("#my-select").bootstrapDualListbox({
+                nonSelectedListLabel: false,
+                selectedListLabel: false,
+                filterTextClear: '全部',
+                filterPlaceHolder: '过滤条件',
+                preserveSelectionOnMove: 'moved',
+                moveOnSelect: true,
+                moveAllLabel: '添加全部',
+                moveSelectedLabel: '添加选中',
+                removeAllLabel: '移除全部',
+                removeSelectedLabel: '移除选中',
+                infoText: '选中/未选中共 {0} 项',
+                infoTextFiltered: '从 {1} 项 筛选 {0} 项',
+                infoTextEmpty: '空',
+            });
         });
         function opentab(url) {
             layer.open({
