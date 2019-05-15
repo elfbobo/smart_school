@@ -89,6 +89,7 @@ Route::group(['namespace' => 'Admin'], function() {
                 Route::resource('service_type', 'ServiceTypeController');
 
                 //桌面模板管理
+                Route::post('desktop_manage/disp-order', 'DesktopManageController@dispOrder')->name('desktop_manage.disp-order');
                 Route::resource('desktop_manage', 'DesktopManageController');
             });
         });

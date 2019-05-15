@@ -23,20 +23,23 @@ class DesktopManageController extends BaseController
     {
         //
         $search = $request->get('search');
-        $sub = DesktopAppModel::select('desktop_id', DB::raw('count(*) as total'))
-            ->groupBy('desktop_id');
-        $data = DesktopManageModel::from('t_desktop_list as a')
-            ->leftJoin(DB::raw("({$sub->toSql()}) as b"), 'b.desktop_id', 'a.id')
-            ->where('state', 0)
+        $cards = DesktopAppModel::select('desktop_id', DB::raw('count(*) as total'))
+            ->groupBy('desktop_id')
+            ->get()->toArray();
+        if ($cards) {
+            $cards = array_column($cards, 'total', 'desktop_id');
+        }
+
+        $data = DesktopManageModel::where('state', 0)
             ->when($search, function ($query) use ($search) {
                 $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('name_eng', 'like', '%' . $search . '%');
             })
-            ->select('a.*', 'b.total')
             ->orderBy('disp_order')
             ->get();
         return view('admin.desktop_manage.index', [
             'data' => $data,
+            'cards' => $cards,
         ]);
     }
 
@@ -129,6 +132,32 @@ class DesktopManageController extends BaseController
     public function edit($id)
     {
         //
+        $info = DesktopManageModel::find($id);
+        $roles = RoleModel::where('state', 0)
+            ->pluck('name', 'id')->toArray();
+        $deskRoles = DesktopRoleModel::where('desktop_id', $id)->pluck('role_id')->toArray();
+        $deskApps = DesktopAppModel::from('t_sys_desktop_app as a')
+            ->join('t_app_list as b', 'b.id', '=', 'a.app_id')
+            ->where('desktop_id', $id)
+            ->orderBy('a.disp_order')
+            ->pluck('b.name', 'app_id')->toArray();
+        $selectApp = [];
+        if ($deskApps) {
+            foreach ($deskApps as $k => $v) {
+                $selectApp[] = [
+                    'app_id' => (string)$k,
+                    'app_name' => $v,
+                ];
+            }
+        }
+
+        return view('admin.desktop_manage.edit', [
+            'info' => $info,
+            'roles' => $roles,
+            'deskRoles' => $deskRoles,
+            'deskApps' => $deskApps,
+            'selectApp' => json_encode($selectApp, 320)
+        ]);
     }
 
     /**
@@ -141,6 +170,53 @@ class DesktopManageController extends BaseController
     public function update(Request $request, $id)
     {
         //
+        $data = $this->validation($request->all(), $id);
+        DB::beginTransaction();
+        try {
+            $deskTop['name'] = $data['name'];
+            $deskTop['name_eng'] = $data['name_eng'];
+            DesktopManageModel::where('id', $id)->update($deskTop);
+
+            $deskAppIds = DesktopAppModel::where('desktop_id', $id)->pluck('app_id')->toArray();
+            $delAppIds = array_diff($deskAppIds, $data['app_ids']);
+            if ($delAppIds) {
+                DesktopAppModel::whereIn('app_id', $delAppIds)->where('desktop_id', $id)->delete();
+            }
+            if ($data['app_ids']) {
+                foreach ($data['app_ids'] as $k => $app_id) {
+                    DesktopAppModel::updateOrCreate([
+                        'app_id' => $app_id,
+                        'desktop_id' => $id,
+                    ], [
+                        'app_id' => $app_id,
+                        'desktop_id' => $id,
+                        'disp_order' => ($k+1)
+                    ]);
+                }
+            }
+
+            $deskRoleIds = DesktopRoleModel::where('desktop_id', $id)->pluck('role_id')->toArray();
+            $delRoleIds = array_diff($deskRoleIds, $data['role_ids']);
+            $addRoleIds = array_diff($data['role_ids'], $deskRoleIds);
+            if ($delRoleIds) {
+                DesktopRoleModel::whereIn('role_id', $delRoleIds)->where('desktop_id', $id)->delete();
+            }
+
+            if ($addRoleIds) {
+                foreach ($addRoleIds as $addRoleId) {
+                    $saveRoles[] = [
+                        'role_id' => $addRoleId,
+                        'desktop_id' => $id,
+                    ];
+                }
+                DesktopRoleModel::insert($saveRoles);
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->responseToJson([], '编辑失败' . $e->getMessage(), 201);
+        }
+        return $this->responseToJson([], '编辑成功');
     }
 
     /**
@@ -173,12 +249,31 @@ class DesktopManageController extends BaseController
         ]);
     }
 
+    //保存排序
+    public function dispOrder(Request $request)
+    {
+        if ($request->app_ids) {
+            $data = [];
+            foreach ($request->app_ids as $k => $app_id) {
+                $data[] = [
+                    'id' => $app_id,
+                    'disp_order' => ($k+1)
+                ];
+            }
+            $res = $this->updateBatch('t_sys_desktop_list', $data);
+            if ($res) {
+                return $this->responseToJson([],'保存成功');
+            }
+        }
+        return $this->responseToJson([], '保存失败', 201);
+    }
+
     private function validation($data, $id = null)
     {
         $rule = [
             'name' => [
                 'required',
-                is_null($id) ? Rule::unique('t_desktop_list') : Rule::unique('t_desktop_list')->ignore($id),
+                is_null($id) ? Rule::unique('t_sys_desktop_list') : Rule::unique('t_sys_desktop_list')->ignore($id),
             ],
         ];
 

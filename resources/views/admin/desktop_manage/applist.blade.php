@@ -40,6 +40,7 @@
             for (i=0;i<parent.selectApp.length;i++) {
                 $('select option').each(function () {
                     if ($(this).val() == parent.selectApp[i]['app_id']) {
+                        console.log($(this).val());
                         $(this).attr('selected', true);
                     }
                 });

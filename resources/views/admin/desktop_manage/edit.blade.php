@@ -4,229 +4,56 @@
         <div class="col-lg-12">
             <div class="card-box">
                 <form role="form" data-parsley-validate>
-                    <div class="form-group row">
-                        <label class="col-2 col-form-label">应用图标</label>
-                        <div class="col-10">
-                            <div id="show-img" style="margin-bottom: 10px;">
-                                <img src="{{ $info->icon_url }}" alt="" width="120">
-                            </div>
-                            <input type="file"
-                                   name="files"
-                                   class="filestyle"
-                                   data-input="false"
-                                   data-btnClass="btn-success"
-                                   data-disabled="false"
-                                   data-text="上传">
-                            <p class="text-muted">支持png、jpg、jpeg格式，大小不超过1M</p>
-                        </div>
+                    <div class="form-group">
+                        <label>桌面名称<span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control"
+                               placeholder="请输入桌面名称，长度4-50位"
+                               minlength="4"
+                               value="{{ $info->name }}"
+                               maxlength="50" required autocomplete="off">
+                        <p class="text-muted font-14 m-t-10">请输入桌面名称，长度4-50位</p>
                     </div>
-
-                    <div class="form-group row">
-                        <label class="col-2 col-form-label">应用类型<span class="text-danger">*</span></label>
-                        <div class="col-10">
-                            <select name="category" class="form-control">
-                                @foreach($category as $k => $item)
-                                    <option value="{{ $k }}" {{ $info->category == $k ? 'selected' : '' }}>{{ $item }}</option>
+                    <div class="form-group">
+                        <label>桌面英文名称</label>
+                        <input type="text" name="name_eng" class="form-control"
+                               placeholder="请输入桌面英文名称，长度4-50位"
+                               minlength="4"
+                               value="{{ $info->name_eng }}"
+                               maxlength="50" autocomplete="off">
+                        <p class="text-muted font-14 m-t-10">请输入桌面名称，长度4-50位，可留空</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="">添加卡片（上下拖拽可以排序）</label>
+                        <ul class="sortable-list taskList list-unstyled" id="inprogress">
+                            @if(!empty($deskApps))
+                            @foreach($deskApps as $k => $app)
+                                <li id="{{ $k }}">
+                                    {{ $app }}
+                                    <div class="mt-2">
+                                        <p class="mb-0">
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="trashThis(this, {{ $k }})">删除</button>
+                                            </p>
+                                      </div>
+                                </li>
                                 @endforeach
-                            </select>
-                        </div>
+                            @endif
+                        </ul>
+                        <a onclick="opentab('{{ url('get-app-list') }}')" class="btn btn-custom btn-block mt-3 waves-effect waves-light"><i class="mdi mdi-plus-circle"></i> 点击添加</a>
+                    </div>
+                    <div class="form-group">
+                        <label for="">选择角色</label>
+                        <br>
+                        <select name="role_ids[]" id="my-select" multiple>
+                            @foreach($roles as $k => $role)
+                                <option value="{{ $k }}" {{ in_array($k, $deskRoles) ? 'selected' : '' }}>{{ $role }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
-                    <div class="form-group row">
-                        <label class="col-2 col-form-label">应用名称<span class="text-danger">*</span></label>
-                        <div class="col-10">
-                            <input type="text" name="name" class="form-control"
-                                   placeholder="请输入应用名称，长度4-30位"
-                                   minlength="4"
-                                   value="{{ $info->name }}"
-                                   maxlength="30" required autocomplete="off">
-                            <p class="text-muted font-14 m-t-10">请输入应用名称，长度4-30位</p>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-2 col-form-label">应用说明</label>
-                        <div class="col-10">
-                            <textarea name="description" id="" rows="6" class="form-control">{{ $info->description }}</textarea>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-2 col-form-label">入口地址<span class="text-danger">*</span></label>
-                        <div class="col-10">
-                            <input type="text" name="entry_url" class="form-control"
-                                   value="{{ $info->entry_url }}"
-                                   placeholder="请输入应用入口地址"
-                                   required autocomplete="off">
-                            {{--<p class="text-muted font-14 m-t-10">请输入应用名称，长度4-30位</p>--}}
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-2 col-form-label">版本号<span class="text-danger">*</span></label>
-                        <div class="col-10">
-                            <input type="number" name="version_code" class="form-control"
-                                   value="{{ $info->version_code }}"
-                                   placeholder="请输入版本号，必须是数字"
-                                   min="0"
-                                   required autocomplete="off">
-                            <p class="text-muted font-14 m-t-10">请输入版本号，必须是数字</p>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-2 col-form-label">版本名称</label>
-                        <div class="col-10">
-                            <input type="text" name="version_name" class="form-control"
-                                   value="{{ $info->version_name }}"
-                                   placeholder="请输入版本名称，不超过50个字符"
-                                   maxlength="50"
-                                   autocomplete="off">
-                            <p class="text-muted font-14 m-t-10">请输入版本名称，不超过50个字符</p>
-                        </div>
-                    </div>
-                    {{--<div class="form-group row">
-                        <label class="col-2 col-form-label">PC应用<span class="text-danger">*</span></label>
-                        <div class="col-10">
-                            <div class="radio radio-info form-check-inline">
-                                <input type="radio" value="0" name="is_pc_app" {{ $info->is_pc_app == 0 ? 'checked' : '' }}>
-                                <label> 否</label>
-                            </div>
-                            <div class="radio form-check-inline">
-                                <input type="radio" value="1" name="is_pc_app" {{ $info->is_pc_app == 1 ? 'checked' : '' }}>
-                                <label> 是</label>
-                            </div>
-                        </div>
-                    </div>--}}
-                    {{--<div class="form-group row">
-                        <label class="col-2 col-form-label">移动应用<span class="text-danger">*</span></label>
-                        <div class="col-10">
-                            <div class="radio radio-info form-check-inline">
-                                <input type="radio" value="0" name="is_mobile_app" {{ $info->is_mobile_app == 0 ? 'checked' : '' }}>
-                                <label> 否</label>
-                            </div>
-                            <div class="radio form-check-inline">
-                                <input type="radio" value="1" name="is_mobile_app" {{ $info->is_mobile_app == 1 ? 'checked' : '' }}>
-                                <label> 是</label>
-                            </div>
-                        </div>
-                    </div>--}}
-                    {{--<div class="form-group row">
-                        <label class="col-2 col-form-label">PC端卡片<span class="text-danger">*</span></label>
-                        <div class="col-10">
-                            <div class="radio radio-info form-check-inline">
-                                <input type="radio" value="0" name="has_pc_card" {{ $info->has_pc_card == 0 ? 'checked' : '' }}>
-                                <label> 否</label>
-                            </div>
-                            <div class="radio form-check-inline">
-                                <input type="radio" value="1" name="has_pc_card" {{ $info->has_pc_card == 1 ? 'checked' : '' }}>
-                                <label> 是</label>
-                            </div>
-                        </div>
-                    </div>--}}
-
-                    {{--<div class="form-group row">
-                        <label class="col-2 col-form-label">移动端卡片<span class="text-danger">*</span></label>
-                        <div class="col-10">
-                            <div class="radio radio-info form-check-inline">
-                                <input type="radio" value="0" name="has_mobile_card" {{ $info->has_mobile_card == 0 ? 'checked' : '' }}>
-                                <label> 否</label>
-                            </div>
-                            <div class="radio form-check-inline">
-                                <input type="radio" value="1" name="has_mobile_card" {{ $info->has_mobile_card == 1 ? 'checked' : '' }}>
-                                <label> 是</label>
-                            </div>
-                        </div>
-                    </div>--}}
-
-                    <div class="form-group row">
-                        <label class="col-2 col-form-label">新应用<span class="text-danger">*</span></label>
-                        <div class="col-10">
-                            <div class="radio radio-info form-check-inline">
-                                <input type="radio" value="0" name="is_new" {{ $info->is_new == 0 ? 'checked' : '' }}>
-                                <label> 否</label>
-                            </div>
-                            <div class="radio form-check-inline">
-                                <input type="radio" value="1" name="is_new" {{ $info->is_new == 1 ? 'checked' : '' }}>
-                                <label> 是</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-2 col-form-label">推荐应用<span class="text-danger">*</span></label>
-                        <div class="col-10">
-                            <div class="radio radio-info form-check-inline">
-                                <input type="radio" value="0" name="is_recommended" {{ $info->is_recommended == 0 ? 'checked' : '' }}>
-                                <label> 否</label>
-                            </div>
-                            <div class="radio form-check-inline">
-                                <input type="radio" value="1" name="is_recommended" {{ $info->is_recommended == 1 ? 'checked' : '' }}>
-                                <label> 是</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-2 col-form-label">上线状态<span class="text-danger">*</span></label>
-                        <div class="col-10">
-                            <div class="radio radio-info form-check-inline">
-                                <input type="radio" value="0" name="online_status" {{ $info->online_status == 0 ? 'checked' : '' }}>
-                                <label> 未上线</label>
-                            </div>
-                            <div class="radio form-check-inline">
-                                <input type="radio" value="1" name="online_status" {{ $info->online_status == 1 ? 'checked' : '' }}>
-                                <label> 运行中</label>
-                            </div>
-                            <div class="radio form-check-inline">
-                                <input type="radio" value="2" name="online_status" {{ $info->online_status == 2 ? 'checked' : '' }}>
-                                <label> 已下线</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-2 col-form-label">周期服务<span class="text-danger">*</span></label>
-                        <div class="col-10">
-                            <div class="radio radio-info form-check-inline">
-                                <input type="radio" value="0" name="is_cycle" {{ $info->is_cycle == 0 ? 'checked' : '' }}>
-                                <label> 否</label>
-                            </div>
-                            <div class="radio form-check-inline">
-                                <input type="radio" value="1" name="is_cycle" {{ $info->is_cycle == 1 ? 'checked' : '' }}>
-                                <label> 是</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group row" id="cycle" style="display: none;">
-                        <label class="col-2 col-form-label">周期服务时间</label>
-                        <div class="col-10">
-                            <input type="text"
-                                   name="cycle_begin_end_time"
-                                   class="form-control"
-                                   id="begin-end-time"
-                                   placeholder="请选择服务开始时间/结束时间"
-                                   value="{{ $info->cycle_begin_time . '~' . $info->cycle_end_time }}"
-                                   readonly
-                                   autocomplete="off">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-2 col-form-label">提供商</label>
-                        <div class="col-10">
-                            <input type="text" class="form-control"
-                                   name="vender"
-                                   placeholder="请输入提供商"
-                                   value="{{ $info->vender }}"
-                                   autocomplete="off">
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <div class="col-10 offset-2">
-                            <input type="hidden" name="icon_url" id="avatar" value="{{ $info->icon_url }}">
-                            <button type="submit" class="btn btn-custom waves-effect waves-light">
-                                提交
-                            </button>
-                        </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-custom waves-effect waves-light">
+                            提交
+                        </button>
                     </div>
                 </form>
             </div>
@@ -235,66 +62,100 @@
     </div>
 @endsection
 @section('before-js')
-    <!--上传插件-->
-    <script src="{{ asset('plugins/jquery-file-upload/js/vendor/jquery.ui.widget.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('plugins/jquery-file-upload/js/jquery.iframe-transport.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('plugins/jquery-file-upload/js/jquery.fileupload.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('plugins/jquery-file-upload/js/jquery.fileupload-process.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('plugins/jquery-file-upload/js/jquery.fileupload-validate.js') }}" type="text/javascript"></script>
+
 @endsection
 @section('script')
     <script type="text/javascript">
+        var selectApp = {!! $selectApp !!};
+        console.log(selectApp);
+        var app_ids = [];
         $(document).ready(function() {
-            @if($info->is_cycle)
-            $('#cycle').show();
-            @endif
-
-            Parsley.on('form:submit', function(e) {
+            //app_ids = $("#inprogress").sortable("toArray");
+            $("#upcoming, #inprogress, #completed").sortable({
+                connectWith: ".taskList",
+                placeholder: 'task-placeholder',
+                forcePlaceholderSize: true,
+                update: function (event, ui) {
+                    app_ids = $("#inprogress").sortable("toArray");
+                }
+            }).disableSelection();
+            Parsley.on('form:submit', function (e) {
+                if ('' == app_ids) { //这个为空，表示没有拖拽事件，直接获取卡片id数组
+                    app_ids = $("#inprogress").sortable("toArray");
+                }
                 var formData = $('form').serializeObject();
-                return postFormData(formData, '{{ route('app_manage.update', ['id' => $info->id]) }}', 'put', true)
+                formData['app_ids'] = JSON.stringify(app_ids);
+                return postFormData(formData, '{{ route('desktop_manage.update', ['id' => $info->id]) }}', 'put', true)
             });
 
+            //多选框
+            $("#my-select").bootstrapDualListbox({
+                nonSelectedListLabel: false,
+                selectedListLabel: false,
+                filterTextClear: '全部',
+                filterPlaceHolder: '过滤条件',
+                preserveSelectionOnMove: 'moved',
+                moveOnSelect: true,
+                moveAllLabel: '添加全部',
+                moveSelectedLabel: '添加选中',
+                removeAllLabel: '移除全部',
+                removeSelectedLabel: '移除选中',
+                infoText: '选中/未选中共 {0} 项',
+                infoTextFiltered: '从 {1} 项 筛选 {0} 项',
+                infoTextEmpty: '空',
+            });
+        });
+        function opentab(url) {
+            layer.open({
+                type:2,
+                area:['600px', '500px'],
+                content:url,
+                btn: ['确定', '取消'],
+                yes: function (index, layero) {
+                    //获取子级window对象
+                    selectApp = [];
+                    var formData = layer.getChildFrame('body');
+                    $(formData).find('select option').each(function () {
+                        if($(this).is(':selected')) {
+                            arr = {
+                                'app_id': $(this).val(),
+                                'app_name': $(this).text(),
+                            },
+                                selectApp.push(arr);
+                        }
+                    });
 
-            var upload = uploadFile('.filestyle', '/api/upload');
-            //上传请求失败时触发的回调函数
-            upload.on("fileuploadfail", function(e, data) {
-                layer.msg('上传失败');
-            })
-            //上传请求成功时触发的回调函数
-                .on("fileuploaddone", function(e, data) {
-                    var res = data.result;
-                    if (res.code == 1000) {
-                        $('#show-img').children().remove();
-                        $('#show-img').append('<img src="' + res.extra.filepath + '" alt="" width="120" class="">');
-                        $('#avatar').val(res.extra.filepath);
-                    }  else {
-                        layer.msg(res.msg);
+                    var html = '';
+                    if (selectApp) {
+                        for (i=0;i<selectApp.length;i++) {
+                            html += '<li id="' + selectApp[i]['app_id'] + '">\n' +
+                                '' + selectApp[i]['app_name'] + '\n' +
+                                '<div class="mt-2">\n' +
+                                '<p class="mb-0">\n' +
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="trashThis(this, ' + selectApp[i]['app_id'] + ')">删除</button>\n' +
+                                '</p>\n' +
+                                '</div>\n' +
+                                '</li>';
+                        }
                     }
-                })
-                //上传请求结束后，不管成功，错误或者中止都会被触发
-                .on("fileuploadalways", function(e, data) {
-                    $('button[type=submit]').attr('disabled', false);
-                })
-        });
+                    $('#inprogress').children().remove();
+                    $('#inprogress').append(html);
+                    layer.close(index);
+                },
+                btn2: function (index) {
+                    layer.close(index)
+                }
+            });
+        }
 
-
-
-        //周期服务时间选择框
-        $('input[name="is_cycle"]').on('click', function () {
-            if ($(this).val() == 1) {
-                $('#cycle').show();
-            } else {
-                $('#cycle').hide();
-            }
-        })
-
-        //年月日时分秒
-        jeDate("#begin-end-time",{
-            range:"~",
-            minDate:"1900-01-01 00:00:00",
-            maxDate:"2099-12-31 23:59:59",
-            format: 'YYYY-MM-DD hh:mm:ss',
-            multiPane: false,
-        });
+        //删除卡片
+        function trashThis(obj, id) {
+            app_ids = []; //清空已获取的，防止第二次提交还保留了上次已删除的卡片id
+            var newData = selectApp.filter(function(item) { //将本次删除的卡片id从已选中的数组中过滤掉
+                return item['app_id'] != id;
+            });
+            selectApp = newData;
+            $(obj).parents('li').remove();
+        }
     </script>
 @endsection

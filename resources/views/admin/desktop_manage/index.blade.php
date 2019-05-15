@@ -48,10 +48,12 @@
                     <li class="task-info" id="{{ $item->id }}">
                         <p class="text-muted">桌面名称：{{ $item->name }}</p>
                         <p class="text-muted">桌面英文名称：{{ $item->name_eng }}</p>
-                        <p class="text-muted">卡片数量：{{ $item->total ?: 0 }}</p>
+                        <p class="text-muted">卡片数量：{{ $cards[$item->id] ?? 0 }}</p>
                         <div class="mt-3">
                             <p class="pull-right mb-0" style="margin-top: -25px;">
-                                <button type="button" class="btn btn-success btn-sm waves-effect waves-light">编辑</button>
+                                <button type="button" class="btn btn-success btn-sm waves-effect waves-light"
+                                    onclick="openIframe('编辑', '{{ route('desktop_manage.edit', ['id' => $item->id]) }}')"
+                                >编辑</button>
                                 <button type="button"
                                         onclick="removeOne('{{ route('desktop_manage.destroy', ['id' => $item->id]) }}')"
                                         class="btn btn-danger btn-sm waves-effect waves-light">删除</button>
@@ -70,6 +72,7 @@
 @endsection
 @section('script')
     <script>
+        var app_ids = {};
         $("#upcoming, #inprogress, #completed").sortable({
             connectWith: ".taskList",
             placeholder: 'task-placeholder',
@@ -79,5 +82,29 @@
                 app_ids = $("#inprogress").sortable("toArray");
             }
         }).disableSelection();
+
+        function saveOrder() {
+            $.ajax({
+                type: 'post',
+                url: '{{ route('desktop_manage.disp-order') }}',
+                dataType: 'json',
+                headers: {
+                    'X-CSRF-TOKEN' : '{{ csrf_token() }}'
+                },
+                data: {app_ids: app_ids},
+                success: function (res) {
+                    if (res.code ==200) {
+                        layer.msg(res.msg, {time:1500}, function () {
+                            window.location.reload();
+                        });
+                    } else {
+                        layer.msg(res.msg);
+                    }
+                },
+                error: function () {
+                    layer.msg('服务器错误');
+                }
+            });
+        }
     </script>
 @endsection

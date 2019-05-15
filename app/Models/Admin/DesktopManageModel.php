@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class DesktopManageModel extends Model
 {
     //
-    protected $table = 't_desktop_list';
+    protected $table = 't_sys_desktop_list';
     protected $fillable = ['id','name', 'name_eng', 'state', 'disp_order'];
 }
