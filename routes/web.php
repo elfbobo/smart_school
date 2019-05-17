@@ -91,6 +91,9 @@ Route::group(['namespace' => 'Admin'], function() {
                 //桌面模板管理
                 Route::post('desktop_manage/disp-order', 'DesktopManageController@dispOrder')->name('desktop_manage.disp-order');
                 Route::resource('desktop_manage', 'DesktopManageController');
+
+                //应用文件夹管理
+                Route::resource('app_folder_manage', 'AppFolderManageController');
             });
         });
     });
