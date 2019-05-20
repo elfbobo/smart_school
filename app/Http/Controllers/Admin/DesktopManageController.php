@@ -285,7 +285,7 @@ class DesktopManageController extends BaseController
         $valid = Validator::make($rule, $msg);
 
         if ($valid->fails()) {
-            exit($this->responseToJson([], $valid->errors()->first(), 201));
+            exit($this->responseToJson([], $valid->errors()->first(), 201, false));
         }
 
         $data['app_ids'] = json_decode($data['app_ids'], true);

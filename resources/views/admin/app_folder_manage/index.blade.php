@@ -30,7 +30,7 @@
                                 <div class="form-group mr-2">
                                     <input  type="text" name="search"
                                             value="{{ request('search') }}"
-                                            placeholder="桌面名称" class="form-control" autocomplete="off">
+                                            placeholder="文件夹名称" class="form-control" autocomplete="off">
                                 </div>
                                 <div class="form-group mr-2">
                                     <button class="btn btn-primary "><i class="fa fa-search mr-2"></i> 搜索</button>
@@ -40,19 +40,25 @@
                     </div>
                 </div>
                 <div class="row">
+                    @foreach($data as $item)
                     <div class="col-lg-3">
-                        <div class="file-man-box">
-                            <a href="" class="file-close"><i class="mdi mdi-close-circle"></i></a>
+                        <div class="file-man-box" style="height: 250px;">
+                            <a href="javascript:;" onclick="removeOne('{{ route('app_folder_manage.destroy', ['id' => $item->id]) }}')" class="file-close"><i class="mdi mdi-close-circle"></i></a>
                             <div>
-                                <a><img class="rounded-circle thumb-sm" alt="64x64" src="{{ asset('assets/admin/images/users/avatar-2.jpg') }}" style="margin:5px;"></a>
+                            @foreach($apps as $app)
+                                @if($app->folder_id == $item->id)
+                                <a><img class="rounded-circle thumb-sm" alt="64x64" src="{{ $app->icon_url ?: asset('assets/admin/images/users/avatar-2.jpg') }}" style="margin:5px;"></a>
+                                @endif
+                            @endforeach
                             </div>
-                            <a href="#" class="file-download" style="font-size:18px;bottom: 0; right: 45px;"><i class="fa fa-pencil"></i> </a>
+                            <a href="javascript:;" onclick="openIframe('编辑', '{{ route('app_folder_manage.edit', ['id' => $item->id]) }}')" class="file-download" style="font-size:18px;bottom: 0; right: 45px;"><i class="fa fa-pencil"></i> </a>
                             <a href="#" class="file-download" style="font-size:18px;bottom: 0;"><i class="fa fa-eye"></i> </a>
-                            <div class="file-man-title">
-                                <p>文件夹名称</p>
+                            <div class="file-man-title" style="position: absolute;bottom: -12px;">
+                                <p class="text-muted" style="padding-top: 15px;">{{ $item->name }}</p>
                             </div>
                         </div>
                     </div>
+                    @endforeach
                 </div>
             </div>
         </div>
