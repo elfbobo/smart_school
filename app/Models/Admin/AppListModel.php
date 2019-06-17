@@ -30,5 +30,6 @@ class AppListModel extends Model
         'entry_url',
         'version_code',
         'version_name',
+        'first_pinyin',
     ];
 }

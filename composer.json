@@ -10,7 +10,8 @@
         "fideloper/proxy": "~3.3",
         "laravel/framework": "5.5.*",
         "laravel/tinker": "~1.0",
-        "maatwebsite/excel": "2.1.*"
+        "maatwebsite/excel": "2.1.*",
+        "overtrue/laravel-pinyin": "^4.0"
     },
     "require-dev": {
         "filp/whoops": "~2.0",
@@ -63,7 +64,7 @@
     "repositories": {
         "packagist": {
             "type": "composer",
-            "url": "https://packagist.phpcomposer.com"
+            "url": "https://packagist.laravel-china.org"
         }
     }
 }

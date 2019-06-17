@@ -332,6 +332,7 @@ class AppManageController extends BaseController
         }
 
         unset($data['cycle_begin_end_time']);
+        $data['first_pinyin'] = strtoupper(substr(pinyin_abbr($data['name']), 0,1));
         return $data;
     }
 }
