@@ -59,6 +59,12 @@ Route::group(['namespace' => 'Admin'], function() {
 
                 //部门管理
                 Route::resource('department', 'DepartmentController');
+                //部门类别
+                Route::post('dept-cate/sortable', 'DeptCategoryController@sortable')->name('dept-cate.sortable');
+                Route::resource('dept-cate', 'DeptCategoryController');
+                //部门办别
+                Route::post('dept-bb/sortable', 'DeptBBController@sortable')->name('dept-bb.sortable');
+                Route::resource('dept-bb', 'DeptBBController');
 
                 //角色管理
                 Route::resource('role', 'RoleController');

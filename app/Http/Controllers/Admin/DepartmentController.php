@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Libs\PHPTree;
 use App\Models\Admin\DepartmentModel;
+use App\Models\Admin\DeptBBModel;
+use App\Models\Admin\DeptCateModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -25,9 +27,13 @@ class DepartmentController extends BaseController
             ->toArray();
         $tree = new PHPTree(['pid' => 'parent_id']);
         $dpts = $tree::toList($data);
+        $category = DeptCateModel::orderBy('sort')->get();
+        $bb = DeptBBModel::orderBy('sort')->get();
         return view('admin.department.index', [
             'dpts' => $dpts,
             'data' => $data ? json_encode(getZTreeData($data, ['name' => 'title'])) : "{}",
+            'category' => $category,
+            'bb' => $bb,
         ]);
     }
 
