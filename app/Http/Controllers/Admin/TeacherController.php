@@ -278,6 +278,7 @@ class TeacherController extends BaseController
         }
         return view('admin.import', [
             'export_url' => route('teacher.import'),
+            'template' => 'teacher.xls'
         ]);
     }
 

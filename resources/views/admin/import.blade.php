@@ -9,7 +9,7 @@
                         <li>导入前，先下载模板，按模板格式导入数据</li>
                         <li>数据越多导入时间就会越长，请耐心等待导入完成</li>
                     </ol>
-                    <a href="" class="btn btn-custom btn-sm">下载模板</a>
+                    <a href="{{ route('download.file', ['file' => $template]) }}" class="btn btn-custom btn-sm">下载模板</a>
                 </div>
                 <form data-parsley-validate>
                     <div class="form-group">
