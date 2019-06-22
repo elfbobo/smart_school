@@ -6,6 +6,7 @@ use App\Models\Admin\DepartmentModel;
 use App\Models\Admin\EpisodeModel;
 use App\Models\Admin\GroupMemberModel;
 use App\Models\Admin\MenuModel;
+use App\Models\Admin\RegionModel;
 use App\Models\Admin\TeamGroupModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -201,6 +202,24 @@ class AjaxController extends Controller
             'horizontalBarData' => [],
             'BasicBarData' => [],
         ]);
+    }
+
+    public function getRegion(Request $request)
+    {
+        $parentCode = $request->get('parent_code');
+        $parentCode = strstr($parentCode, '|', true);
+        $data = RegionModel::where('parent_code', $parentCode)
+            ->pluck('name', 'code')
+            ->toArray();
+
+        $options = '<option></option>';
+        if ($data) {
+            foreach ($data as $code => $name) {
+                $options .= '<option value="' . $code . '|' . $name  . '">[' . $code . ']' . $name . '</option>';
+            }
+        }
+
+        return $this->toJson(['options' => $options]);
     }
 
     private function toJson($data = [], $code = 200, $msg = 'ok')

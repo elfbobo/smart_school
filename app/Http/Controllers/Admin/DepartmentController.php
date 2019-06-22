@@ -13,6 +13,7 @@ use Illuminate\Validation\Rule;
 
 class DepartmentController extends BaseController
 {
+    private $tab = 'dept';
     /**
      * Display a listing of the resource.
      *
@@ -51,9 +52,16 @@ class DepartmentController extends BaseController
             ->get()
             ->toArray();
         $dpts = PHPTree::toList($dpts);
+        $cateogry = DeptCateModel::orderBy('sort')
+            ->pluck('name', 'id')
+            ->toArray();
+        $bb = DeptBBModel::orderBy('sort')->pluck('name', 'id')
+            ->toArray();
         return view('admin.department.create', [
             'dpts' => $dpts,
             'pid' => $pid,
+            'category' => $cateogry,
+            'bb' => $bb,
         ]);
     }
 
@@ -73,7 +81,7 @@ class DepartmentController extends BaseController
         }catch (\Exception $e) {
             return $this->responseToJson([], '新增失败：【' . $e->getMessage() . '】', 201);
         }
-        return $this->responseToJson([], '新增成功');
+        return $this->responseToJson(['url' => route('department.index') . '?tab=' . $this->tab], '新增成功');
     }
 
     /**
@@ -102,9 +110,13 @@ class DepartmentController extends BaseController
             ->get()
             ->toArray();
         $dpts = PHPTree::toList($dpts);
+        $category = DeptCateModel::orderBy('sort')->get();
+        $bb = DeptBBModel::orderBy('sort')->get();
         return view('admin.department.edit', [
             'info' => $info,
             'dpts' => $dpts,
+            'category' => $category,
+            'bb' => $bb,
         ]);
     }
 
@@ -125,7 +137,7 @@ class DepartmentController extends BaseController
         } catch (\Exception $e) {
             return $this->responseToJson([], '编辑失败：【' . $e->getMessage() . '】', 201);
         }
-        return $this->responseToJson([], '编辑成功');
+        return $this->responseToJson(['url' => route('department.index') . '?tab=' . $this->tab], '编辑成功');
     }
 
     /**
@@ -147,7 +159,7 @@ class DepartmentController extends BaseController
             return $this->responseToJson([], '删除失败：【' . $e->getMessage() . '】', 201);
         }
 
-        return $this->responseToJson([], '删除成功');
+        return $this->responseToJson(['url' => route('department.index') . '?tab=' . $this->tab], '删除成功');
     }
 
     private function validation($data, $id = null)

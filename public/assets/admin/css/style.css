@@ -6057,4 +6057,8 @@ File: Responsive
     margin-left: 0;
   }
 }
+.layui-layer { font-size:0.875rem;}
+.layui-layer a:not([href]):not([tabindex]) { color:#FFF;}
+.layui-layer a:not([href]):not([tabindex]):last-child { color:#333;}
+.layui-layer a.layui-layer-btn0:not([href]):not([tabindex]):last-child { color:#FFF;}
 /*# sourceMappingURL=style.css.map */

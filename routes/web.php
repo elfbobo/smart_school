@@ -40,6 +40,8 @@ Route::group(['namespace' => 'Admin'], function() {
         Route::get('get-team-group-option', 'AjaxController@getTeamGroupOption')->name('get-team-group-option');
         Route::match(['get', 'post'],'profile', 'ProfileController@index')->name('user.profile');
 
+        Route::post('get-region', 'AjaxController@getRegion');
+
         //选择app应用列表展示
         Route::get('get-app-list', 'DesktopManageController@getApplist');
 
@@ -100,6 +102,17 @@ Route::group(['namespace' => 'Admin'], function() {
 
                 //应用文件夹管理
                 Route::resource('app_folder_manage', 'AppFolderManageController');
+            });
+
+            //基础数据
+            Route::group(['prefix' => 'base'], function () {
+                //教师基本信息
+                Route::match(['get', 'post'], 'teacher/import', 'TeacherController@import')->name('teacher.import');
+                Route::resource('teacher', 'TeacherController');
+                Route::delete('teacher/delete', 'TeacherController@destroy')->name('teacher.destroy');
+
+                //学生基本信息
+                Route::resource('student', 'StudentController');
             });
         });
     });

@@ -14,5 +14,5 @@ class DepartmentModel extends Model
     //
     protected $table = 't_department';
 
-    protected $fillable = ['code', 'name', 'parent_id', 'status'];
+    protected $fillable = ['code', 'name', 'parent_id', 'status', 'category', 'bbdm', 'leader'];
 }

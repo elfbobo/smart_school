@@ -143,6 +143,32 @@
                                         >
                                         <p class="form-text text-muted">部门名称不超过30位</p>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="">部门类别</label>
+                                        <select name="category" id="" class="form-control" required>
+                                            <option value="">选择部门类别</option>
+                                            @foreach($category as $item)
+                                                <option value="{{ $item->code }}">{{ $item->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="">部门办别</label>
+                                        <select name="bbdm" id="" class="form-control">
+                                            <option value="">选择部门办别</option>
+                                            @foreach($bb as $item)
+                                                <option value="{{ $item->code }}">{{ $item->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="">部门负责人</label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="">备注</label>
+                                        <textarea name="remark" id="" class="form-control" rows="5" maxlength="200" placeholder="不超过200字"></textarea>
+                                    </div>
 
                                     <div class="form-group m-b-0">
                                         <button class="btn btn-custom waves-effect waves-light" type="submit">

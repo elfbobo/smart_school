@@ -61,7 +61,7 @@ class UploadController extends ApiController
         if (!$files->move($dir, $filename)) {
             return $this->responseToJson([], 1001, '上传错误');
         }
-        $filepath = env('APP_URL', 'http://127.0.0.1') . '/uploads'. $filepath;
+        $filepath = $request->root() . '/uploads'. $filepath;
 
         return $this->responseToJson([
             'name' => $realname,

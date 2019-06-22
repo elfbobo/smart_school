@@ -1,6 +1,8 @@
 jQuery(document).ready(function () {
     // Select2
-    $(".select2").select2();
+    $(".select2").select2({
+        placeholder: '请选择'
+    });
 
 
     /**
@@ -65,7 +67,11 @@ function removeOne(url, obj)
                             //delete the row
                             footable.removeRow(row);
                         } else {
-                            window.location.reload();
+                            if ('undefined' !== typeof res.data.url) {
+                                window.location.href = res.data.url;
+                            } else {
+                                window.location.reload();
+                            }
                         }
                     });
                 } else {
@@ -165,9 +171,17 @@ function postFormData(data, url, type, closed) {
                     if (closed) {
                         var index = parent.layer.getFrameIndex(window.name)
                         layer.close(index);
-                        parent.window.location.reload()
+                        if ('undefined' !== typeof res.data.url) {
+                            parent.window.location.href = res.data.url;
+                        } else {
+                            parent.window.location.reload()
+                        }
                     } else {
-                        window.location.reload()
+                        if ('undefined' !== typeof res.data.url) {
+                            window.location.href = res.data.url;
+                        } else {
+                            window.location.reload()
+                        }
                     }
                 });
             } else {
@@ -186,49 +200,85 @@ function postFormData(data, url, type, closed) {
     return false;
 }
 
-function uploadFile(context, url, acceptTypes, nums, size)
-{
-    var nums = nums || 1;
-    var acceptTypes = acceptTypes || /(gif|jpe?g|png)$/i;
-    var size = size || 3*1024*1024
-    var upload = $(context).fileupload({
-        url : url,//请求发送的目标地址
-        Type : 'POST',//请求方式 ，可以选择POST，PUT或者PATCH,默认POST
-        dataType : 'json',//服务器返回的数据类型
-        autoUpload : true,
-        acceptFileTypes : acceptTypes,//验证图片格式
-        maxNumberOfFiles : nums,//最大上传文件数目
-        maxFileSize : size, // 文件上限1MB
-        minFileSize : 100,//文件下限  100b
-        messages : {//文件错误信息
-            acceptFileTypes : '文件类型不匹配',
-            maxFileSize : '文件过大',
-            minFileSize : '文件过小'
-        },
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
-        }
-    });
-    //图片添加完成后触发的事件
-    upload.on("fileuploadadd", function(e, data) {
-        $('button[type=submit]').attr('disabled', true);
-    })
-    //当一个单独的文件处理队列结束触发(验证文件格式和大小)
-    upload.on("fileuploadprocessalways", function(e, data) {
-        //获取文件
-        file = data.files[0];
-        //获取错误信息
-        if (file.error) {
-            $('button[type=submit]').attr('disabled', false);
-            layer.msg(file.error);
-        }
-    })
-    //显示上传进度条
-    upload.on("fileuploadprogressall", function(e, data) {
+/**
+ * 初始化 BootStrap Table 的封装
+ *
+ * 约定：toolbar的id为 (bstableId + "Toolbar")
+ *
+ * @author fengshuonan
+ */
+(function () {
+    var uploadFile = function (upload, url) {
+        this.btInstance = null;                 //jquery和BootStrapTable绑定的对象
+        this.upload = upload;
+        this.url = url;
+        this.acceptTypes = /(gif|jpe?g|png)$/i;
+        this.maxNumFiles = 1;
+        this.maxFileSize = 3*1024*1024;
+        this.data = {};
+        this.queryParams = {}; // 向后台传递的自定义参数
+    };
 
-    })
-    return upload;
-}
+    uploadFile.prototype = {
+        /**
+         * 初始化bootstrap table
+         */
+        init: function () {
+            var upload = this.upload;
+            //var accept = this.acceptTypes;
+            this.btInstance =
+                $(upload).fileupload({
+                    url : this.url,//请求发送的目标地址
+                    Type : 'POST',//请求方式 ，可以选择POST，PUT或者PATCH,默认POST
+                    dataType : 'json',//服务器返回的数据类型
+                    autoUpload : true,
+                    acceptFileTypes : this.acceptTypes,//验证图片格式
+                    maxNumberOfFiles : this.maxNumFiles,//最大上传文件数目
+                    maxFileSize : this.maxFileSize, // 文件上限1MB
+                    minFileSize : 100,//文件下限  100b
+                    messages : {//文件错误信息
+                        acceptFileTypes : '文件类型不匹配',
+                        maxFileSize : '文件过大',
+                        minFileSize : '文件过小'
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                    }
+                });
+            return this;
+        },
+        /**
+         * 向后台传递的自定义参数
+         * @param param
+         */
+        setQueryParams: function (param) {
+            this.queryParams = param;
+        },
+
+        setMaxFileSize: function (size) {
+            this.maxFileSize = size;
+        },
+
+        setAcceptFileTypes: function (accept) {
+            this.acceptTypes = accept;
+        },
+
+        setMaxNumberOfFiles: function (num) {
+            this.maxNumFiles = num;
+        },
+
+        /**
+         * 设置ajax post请求时候附带的参数
+         */
+        setData: function (data) {
+            this.data = data;
+            return this;
+        },
+    };
+
+    window.uploadFile = uploadFile;
+}());
+
 
 //序列化表单json对象
 $.fn.serializeObject = function() {
@@ -322,4 +372,25 @@ function parseParams(data) {
     } catch (err) {
         return '';
     }
+}
+
+function getRegion(obj, url, pcode) {
+    $.ajax({
+        type: 'post',
+        url: url,
+        dataType: 'json',
+        data: {parent_code: pcode},
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+        },
+        success: function (res) {
+            //$('#city').children().remove();
+            $('#area').children().remove();
+            $(obj).children().remove();
+            $(obj).append(res.data.options);
+        },
+        error: function () {
+            layer.msg('服务器错误');
+        }
+    });
 }

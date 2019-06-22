@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 
 class DeptCategoryController extends BaseController
 {
+    private $tab = 'category';
     /**
      * Display a listing of the resource.
      *
@@ -49,7 +50,7 @@ class DeptCategoryController extends BaseController
             return $this->responseToJson([], '新增失败', 201);
         }
 
-        return $this->responseToJson([], '新增成功');
+        return $this->responseToJson(['url' => route('department.index') . '?tab=' . $this->tab], '新增成功');
     }
 
     /**
@@ -96,7 +97,7 @@ class DeptCategoryController extends BaseController
             return $this->responseToJson([], '编辑失败', 201);
         }
 
-        return $this->responseToJson([], '编辑成功');
+        return $this->responseToJson(['url' => route('department.index') . '?tab=' . $this->tab], '编辑成功');
     }
 
     /**
@@ -114,7 +115,7 @@ class DeptCategoryController extends BaseController
             return $this->responseToJson([], '删除失败', 201);
         }
 
-        return $this->responseToJson([], '删除成功');
+        return $this->responseToJson(['url' => route('department.index') . '?tab=' . $this->tab], '删除成功');
     }
 
     public function sortable(Request $request)
