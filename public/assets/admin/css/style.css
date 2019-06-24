@@ -3748,9 +3748,9 @@ input[type="color"] {
    Form Advanced
 ============= */
 /* Select 2 */
-.select2-container {
+/*.select2-container {
   width: 100% !important;
-}
+}*/
 
 .select2-container .select2-selection--single {
   border: 1px solid #e0e8ed;

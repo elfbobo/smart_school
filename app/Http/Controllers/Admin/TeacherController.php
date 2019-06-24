@@ -7,7 +7,9 @@ use App\Models\Admin\DepartmentModel;
 use App\Models\Admin\DictModel;
 use App\Models\Admin\RegionModel;
 use App\Models\Admin\TeacherModel;
+use App\Models\Admin\UserModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
@@ -37,7 +39,7 @@ class TeacherController extends BaseController
 
         $data = TeacherModel::from('t_sys_teacher as a')
             ->leftJoin('t_department as b', 'b.id', '=', 'a.dept_id')
-            ->where(function ($query) use ( $params ) {
+            ->where(function ($query) use ($params) {
                 isset($params['gender']) ? $query->where('gender', $params['gender']) : null;
                 isset($params['status']) ? $query->where('a.status', $params['status']) : null;
                 isset($params['is_prepare']) ? $query->where('is_prepare', $params['is_prepare']) : null;
@@ -91,7 +93,7 @@ class TeacherController extends BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -99,9 +101,17 @@ class TeacherController extends BaseController
         //
         $data = $this->validation($request->all());
         $data['id'] = $this->getUUID();
+        DB::beginTransaction();
         try {
             TeacherModel::create($data);
+            $account['code'] = $data['union_id'];
+            $account['name'] = $data['name'];
+            $account['type'] = 1;
+            $account['password'] = $data['id_card'] ? md5(substr($data['id_card'], -6)) : md5('123456');
+            UserModel::create($account);
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->responseToJson([], '新增失败' . $e->getMessage(), 201);
         }
 
@@ -111,7 +121,7 @@ class TeacherController extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -122,7 +132,7 @@ class TeacherController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -156,17 +166,31 @@ class TeacherController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
         //
         $data = $this->validation($request->all(), $id);
+        DB::beginTransaction();
         try {
             TeacherModel::where('id', $id)->update($data);
+            $account['code'] = $data['union_id'];
+            $account['name'] = $data['name'];
+            $account['type'] = 1;
+            $account['password'] = $data['id_card'] ? md5(substr($data['id_card'], -6)) : md5('123456');
+
+            $user = UserModel::where('code', $data['union_id'])->where('state', '<>', 2)->first();
+            if ($user) {
+                UserModel::where('code', $user->code)->update(['name' => $data['name']]);
+            } else {
+                UserModel::create($account);
+            }
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->responseToJson([], '编辑失败' . $e->getMessage(), 201);
         }
 
@@ -176,7 +200,7 @@ class TeacherController extends BaseController
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, $id)
@@ -200,7 +224,7 @@ class TeacherController extends BaseController
         if ($request->isMethod('post')) {
             set_time_limit(0);
             $file = $request->file('files');
-            Excel::load($file->getPathname(), function ($reader) {
+            Excel::selectSheetsByIndex(0)->load($file->getPathname(), function ($reader) {
                 $header = [
                     "职工号" => "union_id",
                     "姓名" => "name",
@@ -226,54 +250,73 @@ class TeacherController extends BaseController
                 if ($data) {
                     $dic = $this->getDic();
                     foreach ($data as $key => $item) {
-                        foreach ($item as $k => $v) {
-                            $item[$header[$k]] = $v;
-                            unset($item[$k]);
+                        DB::beginTransaction();
+                        try {
+                            foreach ($item as $k => $v) {
+                                $item[$header[$k]] = $v;
+                                unset($item[$k]);
+                            }
+
+                            $dept = DepartmentModel::where('name', $item['dept_id'])->first();
+                            if (!$dept) {
+                                $errors[$key] = '第' . ($key + 1) . '行，所属部门不存在';
+                                continue;
+                            }
+                            $item['dept_id'] = $dept->id;
+                            $dept = DepartmentModel::where('name', $item['dept_sec_id'])->first();
+                            if (!$dept) {
+                                $errors[$key] = '第' . ($key + 1) . '行，所属二级部门不存在';
+                                continue;
+                            }
+                            $item['dept_sec_id'] = $dept->id;
+
+                            $item['gender'] = $item['gender'] == '男' ? 1 : 2;
+                            $item['is_prepare'] = $item['is_prepare'] == '在编' ? 1 : 0;
+                            $status = $this->getCode($dic, 'current_status', $item['status_desc']);
+                            $status ? $item['status'] = $status : null;
+                            $politics_status = $this->getCode($dic, 'politics_status', $item['politics_status_desc']);
+                            $politics_status ? $item['politics_status'] = $politics_status : null;
+
+                            $qualification = $this->getCode($dic, 'qualification', $item['qualification_desc']);
+                            $qualification ? $item['qualification'] = $qualification : null;
+
+                            $titles = $this->getCode($dic, 'titles', $item['titles_desc']);
+                            $titles ? $item['titles'] = $titles : null;
+
+                            $education = $this->getCode($dic, 'education', $item['education_desc']);
+                            $education ? $item['education'] = $education : null;
+
+                            $degree = $this->getCode($dic, 'degree', $item['degree_desc']);
+                            $degree ? $item['degree'] = $degree : null;
+
+                            $id_type = $this->getCode($dic, 'id_type', $item['id_type_desc']);
+                            $id_type ? $item['id_type'] = $id_type : null;
+                            $item['id'] = $this->getUUID();
+                            TeacherModel::updateOrCreate([
+                                'union_id' => $item['union_id'],
+                            ], $item);
+
+                            $user = UserModel::where('code', $item['union_id'])->where('state', '<>', 2)->first();
+                            if ($user) {
+                                UserModel::where('code', $user->code)->update(['name' => $item['name']]);
+                            } else {
+                                $account = [
+                                    'code' => $item['union_id'],
+                                    'name' => $item['name'],
+                                    'type' => 1,
+                                    'password' => $item['id_card'] ? md5(substr($item['id_card'], -6)) : md5('123456')
+                                ];
+                                UserModel::create($account);
+                            }
+                            $num++;
+                            DB::commit();
+                        } catch (\Exception $e) {
+                            DB::rollBack();
                         }
-
-                        $dept = DepartmentModel::where('name', $item['dept_id'])->first();
-                        if (!$dept) {
-                            $errors[$key] = '第' . ($key+1) . '行，所属部门不存在';
-                            continue;
-                        }
-                        $item['dept_id'] = $dept->id;
-                        $dept = DepartmentModel::where('name', $item['dept_sec_id'])->first();
-                        if (!$dept) {
-                            $errors[$key] = '第' . ($key+1) . '行，所属二级部门不存在';
-                            continue;
-                        }
-                        $item['dept_sec_id'] = $dept->id;
-
-                        $item['gender'] = $item['gender'] == '男' ? 1 : 2;
-                        $item['is_prepare'] = $item['is_prepare'] == '在编' ? 1 : 0;
-                        $status = $this->getCode($dic, 'current_status', $item['status_desc']);
-                        $status ? $item['status'] = $status : null;
-                        $politics_status = $this->getCode($dic,'politics_status', $item['politics_status_desc']);
-                        $politics_status ? $item['politics_status'] = $politics_status: null;
-
-                        $qualification = $this->getCode($dic,'qualification', $item['qualification_desc']);
-                        $qualification ? $item['qualification'] = $qualification : null;
-
-                        $titles = $this->getCode($dic,'titles', $item['titles_desc']);
-                        $titles ? $item['titles'] = $titles : null;
-
-                        $education = $this->getCode($dic,'education', $item['education_desc']);
-                        $education ? $item['education'] = $education : null;
-
-                        $degree = $this->getCode($dic,'degree', $item['degree_desc']);
-                        $degree ? $item['degree'] = $degree : null;
-
-                        $id_type = $this->getCode($dic,'id_type', $item['id_type_desc']);
-                        $id_type ? $item['id_type'] = $id_type : null;
-                        $item['id'] = $this->getUUID();
-                        TeacherModel::updateOrCreate([
-                            'union_id' => $item['union_id'],
-                        ], $item);
-                        $num++;
                     }
                 }
 
-                exit($this->responseToJson(['errors' => $errors ?? []], '本次导入成功' . $num . '条，导入失败' . ($count-$num) . '条', 200, false));
+                exit($this->responseToJson(['errors' => $errors ?? []], '本次导入成功' . $num . '条，导入失败' . ($count - $num) . '条', 200, false));
             });
         }
         return view('admin.import', [

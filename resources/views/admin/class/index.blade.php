@@ -1,5 +1,5 @@
 @extends('admin.layout.app')
-@section('title', '教职工管理')
+@section('title', '班级管理')
 @section('css')
     <!--Footable-->
     <link href="{{ asset('plugins/footable/css/footable.core.css') }}" rel="stylesheet">
@@ -11,59 +11,55 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="card-box">
-                <h4 class="m-t-0 header-title">教职工管理</h4>
+                <ul class="nav nav-tabs tabs-bordered">
+                    <li class="nav-item">
+                        <a href="#home-b1" onclick="window.location.href='{{ route('professional.index') }}'"
+                           data-toggle="tab" aria-expanded="false" class="nav-link">
+                            <i class="fi-monitor mr-2"></i> 专业管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#profile-b1" onclick="window.location.href='{{ route('year-professional.index') }}'"
+                           data-toggle="tab" aria-expanded="true" class="nav-link">
+                            <i class="fi-head mr-2"></i> 年度专业
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#messages-b1" onclick="window.location.href='{{ route('class.index') }}'"
+                           data-toggle="tab" aria-expanded="false" class="nav-link active">
+                            <i class="fi-mail mr-2"></i> 班级管理
+                        </a>
+                    </li>
+                </ul>
+                <h4 class="header-title" style="margin-top: 15px;">班级管理</h4>
                 <p class="text-muted m-b-30 font-13">
-                    教职工列表
+                    班级列表
                 </p>
 
                 <div class="mb-3">
                     <div class="row">
                         <div class="col-12 text-sm-center form-inline">
                             <div class="form-group mr-2">
-                                <button class="btn btn-success" onclick="openIframe('导入', '{{ route('teacher.import') }}')"><i class="fa fa-upload mr-2"></i> 导入</button>
+                                <button class="btn btn-success" onclick="openIframe('导入', '{{ route('class.import') }}')"><i class="fa fa-upload mr-2"></i> 导入</button>
                             </div>
                             <div class="form-group mr-2">
-                                <a class="btn btn-primary" href="{{ route('teacher.create') }}"><i class="fa fa-plus mr-2"></i> 新增</a>
+                                <a class="btn btn-primary" href="javascript:;" onclick="openIframe('新增', '{{ route('class.create') }}')"><i class="fa fa-plus mr-2"></i> 新增</a>
                             </div>
                             <div class="form-group mr-2">
-                                <button class="btn btn-danger" onclick="removeAll('{{ route('teacher.destroy') }}')"><i class="fa fa-times mr-2"></i> 删除</button>
+                                <button class="btn btn-danger" onclick="removeAll('{{ route('class.destroy') }}')"><i class="fa fa-times mr-2"></i> 删除</button>
                             </div>
                             <form class="form-inline" id="search-form">
-
-                                <div class="form-group mr-2">
-                                    <select name="gender" id="" class="form-control" onchange="searchValue(this.value, 'gender')">
-                                        <option value="">选择性别</option>
-                                        <option value="1" {{ request('gender')=='1'?'selected':'' }}>男</option>
-                                        <option value="2" {{ request('gender')=='2'?'selected':'' }}>女</option>
-                                    </select>
-                                </div>
-                                <div class="form-group mr-2">
-                                    <select name="dept_id" id="dept-id" class="form-control" onchange="searchValue(this.value, 'dept_id')">
-                                        <option value="">所属部门</option>
-                                        @foreach($dept as $k => $v)
-                                            <option value="{{ $k }}" {{ request('dept_id')==$k?'selected':'' }}>{{ $v }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="form-group mr-2">
-                                    <select name="status" id="status" class="form-control" onchange="searchValue(this.value, 'status')">
-                                        <option value="">当前状态</option>
-                                        @foreach($status as $k=>$v)
-                                            <option value="{{ $k }}" {{ request('status')==$k?'selected':'' }}>{{ $v }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="form-group mr-2">
+                                {{--<div class="form-group mr-2">
                                     <select name="is_prepare" id="" class="form-control" onchange="searchValue(this.value, 'is_prepare')">
                                         <option value="">是否在编</option>
                                         <option value="1" {{ request('is_prepare')=='1'?'selected':'' }}>在编</option>
                                         <option value="0" {{ request('is_prepare')=='0'?'selected':'' }}>非在编</option>
                                     </select>
-                                </div>
+                                </div>--}}
                                 <div class="form-group mr-2">
                                     <input  type="text" name="search"
                                             value="{{ request('search') }}"
-                                            placeholder="职工号/姓名" class="form-control" autocomplete="off">
+                                            placeholder="班级代码/名称" class="form-control" autocomplete="off">
                                 </div>
                                 <div class="form-group mr-2">
                                     <button class="btn btn-primary "><i class="fa fa-search mr-2"></i> 搜索</button>
@@ -82,13 +78,13 @@
                                 <label></label>
                             </div>
                         </th>
-                        <th data-sort-ignore="true">头像</th>
-                        <th data-sort-ignore="true">职工号</th>
-                        <th data-sort-ignore="true">姓名</th>
-                        <th data-sort-ignore="true">性别</th>
-                        <th data-sort-ignore="true">所属部门</th>
-                        <th data-sort-ignore="true">当前状态</th>
-                        <th data-sort-ignore="true">编制属性</th>
+                        <th data-sort-ignore="true">班级代码</th>
+                        <th data-sort-ignore="true">班级名称</th>
+                        <th data-sort-ignore="true">所属年级</th>
+                        <th data-sort-ignore="true">所属学部</th>
+                        <th data-sort-ignore="true">所属专业</th>
+                        <th data-sort-ignore="true">是否在校</th>
+                        <th data-sort-ignore="true">是否使用</th>
                         <th data-sort-ignore="true">操作</th>
                     </tr>
                     </thead>
@@ -102,31 +98,28 @@
                                     <label></label>
                                 </div>
                             </td>
+                            <td>{{ $item->class_code }}</td>
+                            <td>{{ $item->class_name }}</td>
+                            <td>{{ $item->grade }}</td>
+                            <td>{{ $item->dept_name }}</td>
+                            <td>{{ $item->course_name }}</td>
                             <td>
-                                <img src="{{ $item->avatar ? $item->avatar : asset('assets/admin/images/users/avatar-1.jpg') }}"
-                                     alt="user" class="rounded-circle" width="40">
-                            </td>
-                            <td>{{ $item->union_id }}</td>
-                            <td>{{ $item->name }}</td>
-                            <td>
-                                @if($item->gender == 1)
-                                    <label class="badge badge-custom">男</label>
+                                @if($item->in_school == 1)
+                                    <label class="badge badge-success">是</label>
                                 @else
-                                    <label class="badge badge-info">女</label>
+                                    <label class="badge badge-info">否</label>
                                 @endif
                             </td>
-                            <td>{{ $item->dept_name }}</td>
-                            <td>{{ $item->status_desc }}</td>
                             <td>
-                                @if($item->is_prepare == 1)
-                                    <label class="badge badge-success">在编</label>
+                                @if($item->status == 1)
+                                    <label class="badge badge-success">是</label>
                                 @else
-                                    <label class="badge badge-info">非在编</label>
+                                    <label class="badge badge-info">否</label>
                                 @endif
                             </td>
                             <td class="text-center">
-                                <a href="{{ route('teacher.edit', ['id' => $item['id']]) }}" class="btn btn-custom btn-sm btn-icon"><i class="fa fa-pencil"></i></a>
-                                <button class="btn btn-danger btn-sm btn-icon" onclick="removeOne('{{ route('teacher.destroy', ['id' => $item['id']]) }}')"><i class="fa fa-times"></i></button>
+                                <a href="javascript:;" onclick="openIframe('编辑', '{{ route('class.edit', ['id' => $item['id']]) }}')" class="btn btn-custom btn-sm btn-icon"><i class="fa fa-pencil"></i></a>
+                                <button class="btn btn-danger btn-sm btn-icon" onclick="removeOne('{{ route('class.destroy', ['id' => $item['id']]) }}')"><i class="fa fa-times"></i></button>
                             </td>
                         </tr>
                     @endforeach
@@ -139,14 +132,14 @@
                                 <div class="btn-group mb-2">
                                     <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown">{{ request()->get('perpage') }}</button>
                                     <div class="dropdown-menu" x-placement="bottom-start" style="">
-                                        <a class="dropdown-item" href="{{ route('teacher.index', array_merge($params, ['perpage' => 20])) }}">20</a>
-                                        <a class="dropdown-item" href="{{ route('teacher.index', array_merge($params, ['perpage' => 50])) }}">50</a>
-                                        <a class="dropdown-item" href="{{ route('teacher.index', array_merge($params, ['perpage' => 100])) }}">100</a>
+                                        <a class="dropdown-item" href="javascript:;" onclick="searchValue(20,'perpage')">20</a>
+                                        <a class="dropdown-item" href="javascript:;" onclick="searchValue(50, 'perpage')">50</a>
+                                        <a class="dropdown-item" href="javascript:;" onclick="searchValue(100, 'perpage')">100</a>
                                     </div>
                                 </div>
                             </div>
                             <div class="pull-right">
-                                {!! $data->appends($params)->links() !!}
+                                {!! $pagelist !!}
                             </div>
                         </td>
                     </tr>
@@ -187,13 +180,13 @@
         });*/
         function searchValue(value, key)
         {
-            var params = {!! $buildParams !!};
+            var params = {!! $params !!};
             if ('undefined' !== params[key]) {
                 params[key] = value;
             }
 
             params = parseParams(params);
-            window.location.href = '{{ route('teacher.index') }}?' + params;
+            window.location.href = '{{ route('professional.index') }}?' + params;
         }
     </script>
 @endsection

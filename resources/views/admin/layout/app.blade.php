@@ -22,6 +22,11 @@
 
     <script src="{{ asset('assets/admin/js/modernizr.min.js') }}"></script>
     @yield('style')
+    <style>
+        .select2-container .select2-selection--single .select2-selection__rendered {
+            padding-right: 32px;
+        }
+    </style>
 </head>
 
 <body>

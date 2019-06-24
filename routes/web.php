@@ -113,6 +113,23 @@ Route::group(['namespace' => 'Admin'], function() {
 
                 //学生基本信息
                 Route::resource('student', 'StudentController');
+
+                //专业管理
+                Route::match(['get', 'post'], 'professional/import', 'ProfessionalController@import')->name('professional.import');
+                Route::resource('professional', 'ProfessionalController');
+                Route::delete('professional/delete', 'ProfessionalController@destroy')->name('professional.destroy');
+
+                //年度专业管理
+                Route::match(['get', 'post'], 'year-professional/import', 'YearProfessionalController@import')
+                    ->name('year-professional.import');
+                Route::resource('year-professional', 'YearProfessionalController');
+                Route::delete('year-professional/delete', 'YearProfessionalController@destroy')->name('year-professional.destroy');
+
+                //班级管理
+                Route::match(['get', 'post'], 'class/import', 'ClassController@import')->name('class.import');
+                Route::resource('class', 'ClassController');
+
+                Route::delete('class/delete', 'ClassController@destroy')->name('class.destroy');
             });
         });
     });

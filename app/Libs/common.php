@@ -266,3 +266,19 @@ if (!function_exists('msubstr')) {
         }
     }
 }
+
+if (!function_exists('getYear')) {
+    function getYear($prev = 10, $next = 5)
+    {
+        $years = [];
+        for ($i = $prev; $i > 0; $i--) {
+            $years[] = date('Y', strtotime('-' . $i . ' year'));
+        }
+
+        for ($j = 0; $j <= $next; $j++) {
+            $years[] = date('Y', strtotime('+' . $j . ' year'));
+        }
+
+        return $years;
+    }
+}
