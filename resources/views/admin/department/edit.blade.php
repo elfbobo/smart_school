@@ -56,6 +56,12 @@
                     </div>
                     <div class="form-group">
                         <label for="">部门负责人</label>
+                        <select name="leader" id="" class="form-control select2" style="width: 100%;">
+                            <option value=""></option>
+                            @foreach($users as $code => $user)
+                                <option value="{{ $code }}" {{ $info->leader==$code?'selected':'' }}>[{{ $code }}]{{ $user }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="form-group">

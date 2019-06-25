@@ -6,6 +6,7 @@ use App\Libs\PHPTree;
 use App\Models\Admin\DepartmentModel;
 use App\Models\Admin\DeptBBModel;
 use App\Models\Admin\DeptCateModel;
+use App\Models\Admin\UserModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -22,10 +23,17 @@ class DepartmentController extends BaseController
     public function index()
     {
         //
-        $data = DepartmentModel::select('id', 'parent_id', 'code', 'name as title')
-            ->orderBy('sort')
+        $data = DepartmentModel::from('t_department as a')
+            ->leftJoin('t_department_category as b', 'b.code', '=', 'a.category')
+            ->select('a.id', 'a.parent_id', 'a.code', 'a.name as title', 'b.name as dept_name')
+            ->orderBy('a.sort')
             ->get()
             ->toArray();
+        if ($data) {
+            foreach ($data as $k => $item) {
+                $data[$k]['title'] = '[' . $item['dept_name'] . ']' . '[' . $item['code'] . ']'  . $item['title'];
+            }
+        }
         $tree = new PHPTree(['pid' => 'parent_id']);
         $dpts = $tree::toList($data);
         $category = DeptCateModel::orderBy('sort')->get();
@@ -35,6 +43,7 @@ class DepartmentController extends BaseController
             'data' => $data ? json_encode(getZTreeData($data, ['name' => 'title'])) : "{}",
             'category' => $category,
             'bb' => $bb,
+            'users' => UserModel::pluck('name', 'code')->toArray(),
         ]);
     }
 
@@ -117,6 +126,7 @@ class DepartmentController extends BaseController
             'dpts' => $dpts,
             'category' => $category,
             'bb' => $bb,
+            'users' => UserModel::pluck('name', 'code')->toArray(),
         ]);
     }
 

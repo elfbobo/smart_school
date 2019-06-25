@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class BaseController extends Controller
 {
+    protected $category = '01';
     //
     /**
      * 返回json格式数据 主要用于ajax请求

@@ -109,14 +109,15 @@
                     </div>
                     <div class="tab-pane {{ request('tab')=='dept' ? 'show active' : '' }}" id="dept">
                         <div class="row">
-                            <div class="col-sm-6">
+                            <div class="col-sm-7">
                                 <ul id="treeDemo" class="ztree"></ul>
                             </div>
-                            <div class="col-sm-6">
+                            <div class="col-sm-5">
                                 <form action="#" data-parsley-validate="">
                                     <div class="form-group">
                                         <label>上级部门<span class="text-danger">*</span></label>
-                                        <select name="parent_id" id="" class="form-control select2" required>
+                                        <br>
+                                        <select style="width: 100%;" name="parent_id" id="" class="form-control select2" required>
                                             <option value="0">一级部门</option>
                                             @foreach($dpts as $dpt)
                                                 <option value="{{ $dpt['id'] }}">{!! $dpt['title_prefix'] . $dpt['title'] !!}</option>
@@ -163,6 +164,13 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="">部门负责人</label>
+                                        <br>
+                                        <select name="leader" id="" class="form-control select2" style="width: 100%;">
+                                            <option value=""></option>
+                                            @foreach($users as $code => $user)
+                                                <option value="{{ $code }}">{{ $user }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
 
                                     <div class="form-group">

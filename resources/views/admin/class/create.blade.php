@@ -9,45 +9,69 @@
             <div class="card-box">
                 <form data-parsley-validate>
                     <div class="form-group">
-                        <label for="">专业代码</label>
-                        <input type="text" class="form-control" name="code"
-                               placeholder="请输入专业代码，字母或数字组成，不超过10位"
+                        <label for="">班级代码</label>
+                        <input type="text" class="form-control" name="class_code"
+                               placeholder="请输入班级代码，字母或数字组成，不超过10位"
                                maxlength="10"
                                required
                         >
-                        <p class="text-muted form-text">请输入专业代码，字母或数字组成，不超过10位</p>
+                        <p class="text-muted form-text">请输入班级代码，字母或数字组成，不超过10位</p>
                     </div>
                     <div class="form-group">
-                        <label for="">专业名称</label>
+                        <label for="">班级名称</label>
                         <input type="text" class="form-control"
-                               name="name"
-                               placeholder="请输入专业名称，不超过50位"
-                               maxlength="50"
+                               name="class_name"
+                               placeholder="请输入班级名称，不超过20位"
+                               maxlength="20"
                                required
                         >
-                        <p class="text-muted form-text">请输入专业名称，不超过50位</p>
+                        <p class="text-muted form-text">请输入班级名称，不超过20位</p>
                     </div>
                     <div class="form-group">
-                        <label for="">学制</label>
+                        <label for="">班级简称</label>
                         <input type="number" class="form-control"
-                               name="schooling_length"
-                               placeholder="请输入学制，必须是正整数"
+                               name="class_short_name"
+                               placeholder="请输入班级简称，不超过10个字符"
                                max="10"
-                               required
                         >
                     </div>
                     <div class="form-group">
-                        <label for="">专业负责人</label>
-                        <select name="leader_code" id="" class="form-control select2">
+                        <label for="">所属年级</label>
+                        <select name="grade" id="" class="form-control select2" required>
                             <option value=""></option>
-                            @foreach($users as $code => $user)
-                                <option value="{{ $code }}">[{{ $code }}]{{ $user }}</option>
+                            @foreach(getYear() as $year)
+                                <option value="{{ $year }}">{{ $year }}级</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">所属学部</label>
+                        <select name="dept_code" id="" class="form-control select2" required>
+                            <option value=""></option>
+                            @foreach($dept as $code => $item)
+                                <option value="{{ $code .'|'.$item }}">{{ '['.$code.']'.$item }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">所属专业</label>
+                        <select name="course_code" id="" class="form-control select2" required>
+                            <option value=""></option>
+                            @foreach($course as $code => $item)
+                                <option value="{{ $code .'|'.$item }}">{{ '['.$code.']'.$item }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="">是否使用</label>
                         <select name="status" id="" class="form-control">
+                            <option value="1">是</option>
+                            <option value="0">否</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">是否在校</label>
+                        <select name="in_school" id="" class="form-control">
                             <option value="1">是</option>
                             <option value="0">否</option>
                         </select>
@@ -78,7 +102,7 @@
         $(document).ready(function() {
             Parsley.on('form:submit', function(e) {
                 var formData = $('form').serializeObject();
-                return postFormData(formData, '{{ route('professional.store') }}', 'post', true)
+                return postFormData(formData, '{{ route('class.store') }}', 'post', true)
             });
         });
 

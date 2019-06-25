@@ -37,6 +37,51 @@
                 </p>
 
                 <div class="mb-3">
+                    <div class="row m-b-30">
+                        <div class="col-12 text-sm-center form-inline">
+                            <form class="form-inline" id="search-form">
+                                <div class="form-group mr-2">
+                                    <select id="" class="form-control" onchange="searchValue(this.value, 'grade')">
+                                        <option value="">所属年级</option>
+                                        @foreach(getYear() as $year)
+                                            <option value="{{ $year }}" {{ request('grade')==$year?'selected':'' }}>{{ $year }}级</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group mr-2">
+                                    <select id="" class="form-control" onchange="searchValue(this.value, 'dept_code')">
+                                        <option value="">所属学部</option>
+                                        @foreach($dept as $code => $name)
+                                            <option value="{{ $code }}" {{ request('dept_code')==$code?'selected':'' }}>{{ $name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group mr-2">
+                                    <select id="course-code" class="form-control" onchange="searchValue(this.value, 'course_code')">
+                                        <option value="">所属专业</option>
+                                        @foreach($course as $code => $name)
+                                            <option value="{{ $code }}" {{ request('course_code')==$code?'selected':'' }}>{{ $name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group mr-2">
+                                    <select id="course-code" class="form-control" onchange="searchValue(this.value, 'in_school')">
+                                        <option value="">是否在校</option>
+                                        <option value="1" {{ request('in_school')=='1'?'selected':'' }}>是</option>
+                                        <option value="0" {{ request('in_school')=='0'?'selected':'' }}>否</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mr-2">
+                                    <input  type="text" name="search"
+                                            value="{{ request('search') }}"
+                                            placeholder="班级代码/名称" class="form-control" autocomplete="off">
+                                </div>
+                                <div class="form-group mr-2">
+                                    <button class="btn btn-primary "><i class="fa fa-search mr-2"></i> 搜索</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-12 text-sm-center form-inline">
                             <div class="form-group mr-2">
@@ -48,23 +93,6 @@
                             <div class="form-group mr-2">
                                 <button class="btn btn-danger" onclick="removeAll('{{ route('class.destroy') }}')"><i class="fa fa-times mr-2"></i> 删除</button>
                             </div>
-                            <form class="form-inline" id="search-form">
-                                {{--<div class="form-group mr-2">
-                                    <select name="is_prepare" id="" class="form-control" onchange="searchValue(this.value, 'is_prepare')">
-                                        <option value="">是否在编</option>
-                                        <option value="1" {{ request('is_prepare')=='1'?'selected':'' }}>在编</option>
-                                        <option value="0" {{ request('is_prepare')=='0'?'selected':'' }}>非在编</option>
-                                    </select>
-                                </div>--}}
-                                <div class="form-group mr-2">
-                                    <input  type="text" name="search"
-                                            value="{{ request('search') }}"
-                                            placeholder="班级代码/名称" class="form-control" autocomplete="off">
-                                </div>
-                                <div class="form-group mr-2">
-                                    <button class="btn btn-primary "><i class="fa fa-search mr-2"></i> 搜索</button>
-                                </div>
-                            </form>
                         </div>
                     </div>
                 </div>
@@ -167,13 +195,10 @@
 @section('script')
     <script>
         $(document).ready(function () {
-            /*$('#status').select2({
-                width: "100%",
+            $('#course-code').select2({
+                placeholder: '所属专业',
+                allowClear: true,
             });
-
-            $('#dept-id').select2({
-                width: "100%",
-            });*/
         });
         /*$('.dept-id').select2({
             placeholder: '所属部门'
@@ -186,7 +211,7 @@
             }
 
             params = parseParams(params);
-            window.location.href = '{{ route('professional.index') }}?' + params;
+            window.location.href = '{{ route('class.index') }}?' + params;
         }
     </script>
 @endsection

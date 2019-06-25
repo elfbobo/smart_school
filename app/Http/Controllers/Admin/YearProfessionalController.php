@@ -11,7 +11,6 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class YearProfessionalController extends BaseController
 {
-    private $category = '01';
     /**
      * Display a listing of the resource.
      *

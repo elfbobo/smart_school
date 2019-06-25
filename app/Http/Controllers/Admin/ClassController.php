@@ -6,6 +6,8 @@ use App\Models\Admin\ClassModel;
 use App\Models\Admin\DepartmentModel;
 use App\Models\Admin\ProfessionalModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ClassController extends BaseController
@@ -20,14 +22,38 @@ class ClassController extends BaseController
         //
         $search = $request->get('search', null);
         $perPage = $request->get('perpage', 20);
+        $grade = $request->get('grade', null);
+        $deptCode = $request->get('dept_code', null);
+        $courseCode = $request->get('course_code', null);
+        $inSchool = $request->get('in_school', null);
         $params = [];
         !is_null($search) ? $params['search'] = $search : null;
+        !is_null($grade) ? $params['grade'] = $grade : null;
+        !is_null($deptCode) ? $params['dept_code'] = $deptCode : null;
+        !is_null($courseCode) ? $params['course_code'] = $courseCode : null;
+        !is_null($inSchool) ? $params['in_school'] = $inSchool : null;
         $data = ClassModel::from('t_sys_class as a')
             //->leftJoin('t_user_account as b', 'b.code', '=', 'a.leader_code')
-            ->where(function ($query) use ( $search ) {
+            ->where(function ($query) use ( $search,$grade,$deptCode,$courseCode,$inSchool ) {
                 if ($search) {
                     $query->where('a.code', 'like', '%' . $search . '%')
                         ->orWhere('a.name', 'like', '%' . $search . '%');
+                }
+
+                if ($grade) {
+                    $query->where('grade', $grade);
+                }
+
+                if ($deptCode) {
+                    $query->where('dept_code', $deptCode);
+                }
+
+                if ($courseCode) {
+                    $query->where('course_code', $courseCode);
+                }
+
+                if (!is_null($inSchool)) {
+                    $query->where('in_school', $inSchool);
                 }
             })
             ->select('a.*')
@@ -36,6 +62,9 @@ class ClassController extends BaseController
             'params' => $params ? json_encode($params, 320) : '{}',
             'data' => $data,
             'pagelist' => $data->appends($params)->links(),
+            'dept' => DepartmentModel::where('category', $this->category)
+                ->pluck('name', 'code')->toArray(),
+            'course' => $course = ProfessionalModel::pluck('name', 'code')->toArray(),
         ]);
     }
 
@@ -47,6 +76,14 @@ class ClassController extends BaseController
     public function create()
     {
         //
+        $dept = DepartmentModel::where('category', $this->category)
+            ->pluck('name', 'code')->toArray();
+
+        $course = ProfessionalModel::pluck('name', 'code')->toArray();
+        return view('admin.class.create', [
+            'dept' => $dept,
+            'course' => $course,
+        ]);
     }
 
     /**
@@ -58,6 +95,14 @@ class ClassController extends BaseController
     public function store(Request $request)
     {
         //
+        $data = $this->validation($request->all());
+        try {
+            ClassModel::create($data);
+        } catch (\Exception $e) {
+            return $this->responseToJson([], '新增失败' . $e->getMessage(), 201);
+        }
+
+        return $this->responseToJson([], '新增成功');
     }
 
     /**
@@ -80,6 +125,16 @@ class ClassController extends BaseController
     public function edit($id)
     {
         //
+        $info = ClassModel::find($id);
+        $dept = DepartmentModel::where('category', $this->category)
+            ->pluck('name', 'code')->toArray();
+
+        $course = ProfessionalModel::pluck('name', 'code')->toArray();
+        return view('admin.class.edit', [
+            'dept' => $dept,
+            'course' => $course,
+            'info' => $info,
+        ]);
     }
 
     /**
@@ -92,6 +147,14 @@ class ClassController extends BaseController
     public function update(Request $request, $id)
     {
         //
+        $data = $this->validation($request->all(), $id);
+        try {
+            ClassModel::where('id', $id)->update($data);
+        } catch (\Exception $e) {
+            return $this->responseToJson([], '编辑失败' . $e->getMessage(), 201);
+        }
+
+        return $this->responseToJson([], '编辑成功');
     }
 
     /**
@@ -100,9 +163,20 @@ class ClassController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         //
+        if ($id == 'delete') {
+            $id = $request->get('id');
+        }
+
+        try {
+            ClassModel::destroy($id);
+        } catch (\Exception $e) {
+            return $this->responseToJson([], '删除失败', 201);
+        }
+
+        return $this->responseToJson([], '删除成功');
     }
 
     public function import(Request $request)
@@ -175,5 +249,35 @@ class ClassController extends BaseController
             'export_url' => route('class.import'),
             'template' => 'class.xls'
         ]);
+    }
+
+    private function validation($data, $id = null)
+    {
+        $rule = [
+            'class_code' => [
+                'regex:/^[a-z0-9]{2,}$/',
+                is_null($id) ? Rule::unique('t_sys_class') : Rule::unique('t_sys_class')->ignore($id),
+            ],
+        ];
+
+        $msg = [
+            'class_code.regex' => '班级代码必须是字母或数字组成',
+            'class_code.unique' => '班级代码已存在',
+        ];
+
+        $valid = Validator::make($data, $rule, $msg);
+
+        if ($valid->fails()) {
+            exit($this->responseToJson([], $valid->errors()->first(), 201, false));
+        }
+
+        $arr = explode('|', $data['dept_code']);
+        $data['dept_code'] = $arr[0];
+        $data['dept_name'] = $arr[1];
+
+        $arr = explode('|', $data['course_code']);
+        $data['course_code'] = $arr[0];
+        $data['course_name'] = $arr[1];
+        return $data;
     }
 }
