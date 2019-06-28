@@ -112,7 +112,9 @@ Route::group(['namespace' => 'Admin'], function() {
                 Route::delete('teacher/delete', 'TeacherController@destroy')->name('teacher.destroy');
 
                 //学生基本信息
+                Route::match(['get', 'post'], 'student/import', 'StudentController@import')->name('student.import');
                 Route::resource('student', 'StudentController');
+                Route::delete('student/delete', 'StudentController@destroy')->name('student.destroy');
 
                 //专业管理
                 Route::match(['get', 'post'], 'professional/import', 'ProfessionalController@import')->name('professional.import');
