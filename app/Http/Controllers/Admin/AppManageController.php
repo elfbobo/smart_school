@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Libs\PHPTree;
+use App\Models\Admin\AppFolderManageModel;
+use App\Models\Admin\AppFolderModel;
 use App\Models\Admin\AppListModel;
 use App\Models\Admin\AppRoleModel;
 use App\Models\Admin\AppServiceModel;
@@ -128,8 +130,10 @@ class AppManageController extends BaseController
     public function create()
     {
         //
+        $folders = AppFolderManageModel::where('state', 0)->pluck('name', 'id')->toArray();
         return view('admin.app_manage.create', [
-            'category' => $this->appType
+            'category' => $this->appType,
+            'folders' => json_encode($folders),
         ]);
     }
 

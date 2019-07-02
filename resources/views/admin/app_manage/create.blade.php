@@ -23,7 +23,7 @@
                     <div class="form-group row">
                         <label class="col-2 col-form-label">应用类型<span class="text-danger">*</span></label>
                         <div class="col-10">
-                            <select name="category" class="form-control">
+                            <select name="category" class="form-control" onchange="selectFolder(this.value)">
                                 @foreach($category as $k => $item)
                                     <option value="{{ $k }}">{{ $item }}</option>
                                 @endforeach
@@ -52,6 +52,7 @@
                         <label class="col-2 col-form-label">入口地址<span class="text-danger">*</span></label>
                         <div class="col-10">
                             <input type="text" name="entry_url" class="form-control"
+                                   id="entry-url"
                                    placeholder="请输入应用入口地址"
                                    required autocomplete="off">
                             {{--<p class="text-muted font-14 m-t-10">请输入应用名称，长度4-30位</p>--}}
@@ -299,5 +300,39 @@
             infoTextFiltered: '从 {1} 项 筛选 {0} 项',
             infoTextEmpty: '空',
         });
+
+        function selectFolder(value) {
+            if (value == 2) {
+                var folders = {!! $folders !!};
+                var form = '<div class="form-group card-box" style="width: 90%;">' +
+                                '<label>选择文件夹</label>' +
+                                '<select class="form-control">' +
+                                    '<option value="">请选择</option>';
+                if (folders != '') {
+                    for (var index in folders) {
+                        form += '<option value="'+index+'">'+folders[index]+'</option>'
+                    }
+                }
+                form += '</select></div>';
+                layer.open({
+                    type:1,
+                    area:['600px', '250px'],
+                    content: form,
+                    btn: ['确定'],
+                    yes: function (index, layero) {
+                        var folder_id = layero.find('select option:selected').val();
+                        if (folder_id) {
+                            var url = {
+                                type: 'app_folder',
+                                folder_id: folder_id,
+                            };
+
+                            $('#entry-url').val(JSON.stringify(url));
+                        }
+                        layer.close(index);
+                    }
+                });
+            }
+        }
     </script>
 @endsection
