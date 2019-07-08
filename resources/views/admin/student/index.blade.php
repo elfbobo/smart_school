@@ -18,6 +18,47 @@
 
                 <div class="mb-3">
                     <div class="row">
+                        <div class="col-12 text-sm-center form-inline m-b-30">
+                            <form class="form-inline" id="search-form">
+
+                                <div class="form-group mr-2">
+                                    <select name="gender" id="" class="form-control" onchange="searchValue(this.value, 'gender')">
+                                        <option value="">选择性别</option>
+                                        <option value="1" {{ request('gender')=='1'?'selected':'' }}>男</option>
+                                        <option value="2" {{ request('gender')=='2'?'selected':'' }}>女</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mr-2">
+                                    <select name="dept_id" id="dept-id" class="form-control select2"
+                                            data-placeholder="所属系部"
+                                            onchange="searchValue(this.value, 'dept_id')">
+                                        <option value="">所属系部</option>
+                                        @foreach($dept as $k => $v)
+                                            <option value="{{ $k }}" {{ request('dept_code')==$k ?'selected':'' }}>{{ $v }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group mr-2">
+                                    <select name="is_prepare" id=""
+                                            class="form-control select2"
+                                            data-placeholder="选择年级"
+                                            onchange="searchValue(this.value, 'is_prepare')">
+                                        <option value="">所在年级</option>
+                                        @foreach(getYear() as $year)
+                                            <option value="{{ $year }}" {{ request('grade') == $year ? 'selected' : '' }}>{{ $year }}级</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group mr-2">
+                                    <input  type="text" name="search"
+                                            value="{{ request('search') }}"
+                                            placeholder="学号/姓名" class="form-control" autocomplete="off">
+                                </div>
+                                <div class="form-group mr-2">
+                                    <button class="btn btn-primary "><i class="fa fa-search mr-2"></i> 搜索</button>
+                                </div>
+                            </form>
+                        </div>
                         <div class="col-12 text-sm-center form-inline">
                             <div class="form-group mr-2">
                                 <button class="btn btn-success" onclick="openIframe('导入', '{{ route('student.import') }}')"><i class="fa fa-upload mr-2"></i> 导入</button>
@@ -28,39 +69,6 @@
                             <div class="form-group mr-2">
                                 <button class="btn btn-danger" onclick="removeAll('{{ route('student.destroy') }}')"><i class="fa fa-times mr-2"></i> 删除</button>
                             </div>
-                            <form class="form-inline" id="search-form">
-
-                                <div class="form-group mr-2">
-                                    <select name="gender" id="" class="form-control" onchange="searchValue(this.value, 'gender')">
-                                        <option value="">选择性别</option>
-                                        <option value="1" {{ request('gender')=='1'?'selected':'' }}>男</option>
-                                        <option value="2" {{ request('gender')=='2'?'selected':'' }}>女</option>
-                                    </select>
-                                </div>
-                                {{--<div class="form-group mr-2">
-                                    <select name="dept_id" id="dept-id" class="form-control" onchange="searchValue(this.value, 'dept_id')">
-                                        <option value="">所属部门</option>
-                                        @foreach($dept as $k => $v)
-                                            <option value="{{ $k }}" {{ request('dept_id')==$k?'selected':'' }}>{{ $v }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>--}}
-                                <div class="form-group mr-2">
-                                    <select name="is_prepare" id="" class="form-control" onchange="searchValue(this.value, 'is_prepare')">
-                                        <option value="">是否在编</option>
-                                        <option value="1" {{ request('is_prepare')=='1'?'selected':'' }}>在编</option>
-                                        <option value="0" {{ request('is_prepare')=='0'?'selected':'' }}>非在编</option>
-                                    </select>
-                                </div>
-                                <div class="form-group mr-2">
-                                    <input  type="text" name="search"
-                                            value="{{ request('search') }}"
-                                            placeholder="职工号/姓名" class="form-control" autocomplete="off">
-                                </div>
-                                <div class="form-group mr-2">
-                                    <button class="btn btn-primary "><i class="fa fa-search mr-2"></i> 搜索</button>
-                                </div>
-                            </form>
                         </div>
                     </div>
                 </div>

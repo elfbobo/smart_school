@@ -12,6 +12,8 @@
     <link rel="shortcut icon" href="{{ asset('assets/admin/images/favicon.ico') }}">
     <link href="{{ asset('plugins/bootstrap-select/css/bootstrap-select.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+
+    <link href="{{ asset('plugins/jeDate/skin/jedate.css') }}" rel="stylesheet" type="text/css" />
     <!-- Toastr css -->
     <link href="{{ asset('plugins/jquery-toastr/jquery.toast.min.css') }}" rel="stylesheet" />
     @yield('css')
@@ -273,6 +275,8 @@
 
 <script src="{{ asset('plugins/select2/js/select2.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('plugins/select2/js/i18n/zh-CN.js') }}" type="text/javascript"></script>
+<script type="text/javascript" src="{{ asset('plugins/jeDate/dist/jedate.min.js') }}"></script>
+
 
 <!-- Toastr js -->
 <script src="{{ asset('plugins/jquery-toastr/jquery.toast.min.js') }}" type="text/javascript"></script>

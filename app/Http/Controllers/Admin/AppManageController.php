@@ -177,10 +177,12 @@ class AppManageController extends BaseController
     public function edit($id)
     {
         //
+        $folders = AppFolderManageModel::where('state', 0)->pluck('name', 'id')->toArray();
         $info = AppListModel::find($id);
         return view('admin.app_manage.edit', [
             'info' => $info,
             'category' => $this->appType,
+            'folders' => json_encode($folders),
         ]);
     }
 

@@ -105,4 +105,14 @@ class BaseController extends Controller
         }
 
     }
+
+    //获取字典项的代码和名称
+    protected function getCodeName($str)
+    {
+        $arr = explode('|', $str);
+        return [
+            'code' => $arr[0] ?? '',
+            'name' => $arr[1] ?? '',
+        ];
+    }
 }

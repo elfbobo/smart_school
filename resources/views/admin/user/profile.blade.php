@@ -58,7 +58,7 @@
                                maxlength="20">
                         <small id="emailHelp" class="form-text text-muted">不超过20个字</small>
                     </div>
-                    <div class="form-group">
+                    {{--<div class="form-group">
                         <label for="">性别</label><br>
                         <div class="radio radio-info form-check-inline">
                             <input type="radio" value="1" name="sex" {{ $userinfo->sex == 1 ? 'checked' : '' }}>
@@ -68,20 +68,20 @@
                             <input type="radio" value="2" name="sex" {{ $userinfo->sex == 2 ? 'checked' : '' }}>
                             <label for="inlineRadio1"> 女</label>
                         </div>
-                    </div>
+                    </div>--}}
                     <div class="form-group">
                         <label for="exampleInputPassword1">密码</label>
                         <input type="password" name="password" class="form-control" placeholder="密码留空表示不修改">
                     </div>
-                    <div class="form-group">
+                    {{--<div class="form-group">
                         <label for="exampleInputEmail1">手机号</label>
                         <input type="text" name="phone" class="form-control"
                                placeholder="可为空，不超过11个字符"
                                value="{{ $userinfo->phone }}"
                                maxlength="11">
                         <small id="emailHelp" class="form-text text-muted">必须是11位有效的手机号</small>
-                    </div>
-                    <div class="form-group">
+                    </div>--}}
+                    {{--<div class="form-group">
                         <label for="exampleInputEmail1">固话/座机</label>
                         <input type="text" name="telephone"
                                class="form-control"
@@ -89,7 +89,7 @@
                                value="{{ $userinfo->telephone }}"
                                maxlength="20">
                         <small id="emailHelp" class="form-text text-muted">正确格式为：025-88888888</small>
-                    </div>
+                    </div>--}}
 
                     <button type="submit" class="btn btn-primary">提交</button>
                 </form>

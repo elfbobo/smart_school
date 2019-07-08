@@ -2,9 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Admin\ClassModel;
+use App\Models\Admin\DepartmentModel;
+use App\Models\Admin\DictModel;
+use App\Models\Admin\ProfessionalModel;
+use App\Models\Admin\RegionModel;
 use App\Models\Admin\StudentModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 
 class StudentController extends BaseController
@@ -24,12 +31,13 @@ class StudentController extends BaseController
         $data = StudentModel::where(function ($query) {
 
         })
-            ->select('avatar', 'union_id', 'name', 'gender', 'grade', 'dept_name', 'course_name', 'class_name', 'in_registry', 'in_school')
+            ->select('id','avatar', 'union_id', 'name', 'gender', 'grade', 'dept_name', 'course_name', 'class_name', 'in_registry', 'in_school')
             ->paginate($perPage);
         return view('admin.student.index', [
             'params' => $params ? json_encode($params, 320) : '{}',
             'data' => $data,
             'pagelist' => $data->appends($params)->links(),
+            'dept' => DepartmentModel::where('category', $this->category)->pluck('name', 'code')->toArray(),
         ]);
     }
 
@@ -41,7 +49,26 @@ class StudentController extends BaseController
     public function create()
     {
         //
-        return view('admin.student.create');
+        return view('admin.student.create', [
+            'id_type' => DictModel::getData('id_type'),
+            'nation' => DictModel::getData('nation'),
+            'politics_status' => DictModel::getData('politics_status'),
+            'religion' => DictModel::getData('religion'),
+            'marital_status' => DictModel::getData('marital_status'),
+            'health_status' => DictModel::getData('health_status'),
+            'country' => DictModel::getData('country'),
+            'gatq' => DictModel::getData('gatq'),
+            'blood_type' => DictModel::getData('blood_type'),
+            'identity_type' => DictModel::getData('identity_type'),
+            'student_type' => DictModel::getData('student_type'),
+            'birthplace' => RegionModel::where('type', 'area')->pluck('name', 'code')->toArray(),
+            'dept' => DepartmentModel::where('category', $this->category)->pluck('name', 'code')->toArray(),
+            'course' => ProfessionalModel::orderBy('sort')->pluck('name', 'code')->toArray(),
+            'class' => ClassModel::where('status', 1)->pluck('class_name', 'class_code')->toArray(),
+            'education' => DictModel::getData('education'),
+            'train_type' => DictModel::getData('train_type'),
+            'entry_type' => DictModel::getData('entry_type'),
+        ]);
     }
 
     /**
@@ -53,8 +80,14 @@ class StudentController extends BaseController
     public function store(Request $request)
     {
         //
-        $data = $request->all();
-        StudentModel::create($data);
+        $data = $this->validation($request->all());
+        try {
+            StudentModel::create($data);
+        } catch (\Exception $e) {
+            return $this->responseToJson([], '新增失败：【' . $e->getMessage() . '】', 201);
+        }
+
+        return $this->responseToJson(['url' => route('student.index')], '新增成功');
     }
 
     /**
@@ -77,6 +110,28 @@ class StudentController extends BaseController
     public function edit($id)
     {
         //
+        $info = StudentModel::find($id);
+        return view('admin.student.edit', [
+            'info' => $info,
+            'id_type' => DictModel::getData('id_type'),
+            'nation' => DictModel::getData('nation'),
+            'politics_status' => DictModel::getData('politics_status'),
+            'religion' => DictModel::getData('religion'),
+            'marital_status' => DictModel::getData('marital_status'),
+            'health_status' => DictModel::getData('health_status'),
+            'country' => DictModel::getData('country'),
+            'gatq' => DictModel::getData('gatq'),
+            'blood_type' => DictModel::getData('blood_type'),
+            'identity_type' => DictModel::getData('identity_type'),
+            'student_type' => DictModel::getData('student_type'),
+            'birthplace' => RegionModel::where('type', 'area')->pluck('name', 'code')->toArray(),
+            'dept' => DepartmentModel::where('category', $this->category)->pluck('name', 'code')->toArray(),
+            'course' => ProfessionalModel::orderBy('sort')->pluck('name', 'code')->toArray(),
+            'class' => ClassModel::where('status', 1)->pluck('class_name', 'class_code')->toArray(),
+            'education' => DictModel::getData('education'),
+            'train_type' => DictModel::getData('train_type'),
+            'entry_type' => DictModel::getData('entry_type'),
+        ]);
     }
 
     /**
@@ -89,6 +144,14 @@ class StudentController extends BaseController
     public function update(Request $request, $id)
     {
         //
+        $data = $this->validation($request->all(), $id);
+        try {
+            StudentModel::where('id', $id)->update($data);
+        } catch (\Exception $e) {
+            return $this->responseToJson([], '编辑失败：【' . $e->getMessage() . '】', 201);
+        }
+
+        return $this->responseToJson(['url' => route('student.index')], '编辑成功');
     }
 
     /**
@@ -97,9 +160,20 @@ class StudentController extends BaseController
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         //
+        if ($id == 'delete') {
+            $id = $request->get('id');
+        }
+
+        try {
+            StudentModel::destroy($id);
+        } catch (\Exception $e) {
+            return $this->responseToJson([], '删除失败：【' . $e->getMessage() . '】', 201);
+        }
+
+        return $this->responseToJson([], '删除成功');
     }
 
     public function import(Request $request)
@@ -205,5 +279,128 @@ class StudentController extends BaseController
             'export_url' => route('student.import'),
             'template' => 'student.xls'
         ]);
+    }
+
+    private function validation($data, $id = null)
+    {
+        $rule = [
+            'union_id' => [
+                is_null($id) ? Rule::unique('t_sys_student') : Rule::unique('t_sys_student')->ignore($id),
+            ],
+        ];
+
+        $msg = [
+            'union_id.unique' => '学号已存在'
+        ];
+
+        $valid = Validator::make($data, $rule, $msg);
+
+        if ($valid->fails()) {
+            return $this->responseToJson([], $valid->errors()->first(), 201, false);
+        }
+
+        if ($data['id_type']) {
+            $arr = $this->getCodeName($data['id_type']);
+            $data['id_type_code'] = $arr['code'];
+            $data['id_type'] = $arr['name'];
+        }
+
+        if ($data['nation']) {
+            $arr = $this->getCodeName($data['nation']);
+            $data['nation_code'] = $arr['code'];
+            $data['nation'] = $arr['name'];
+        }
+
+        if ($data['politics_status']) {
+            $arr = $this->getCodeName($data['politics_status']);
+            $data['politics_status_code'] = $arr['code'];
+            $data['politics_status'] = $arr['name'];
+        }
+
+        if ($data['religion']) {
+            $arr = $this->getCodeName($data['religion']);
+            $data['religion_code'] = $arr['code'];
+            $data['religion'] = $arr['name'];
+        }
+
+        if ($data['marital_status']) {
+            $arr = $this->getCodeName($data['marital_status']);
+            $data['marital_status_code'] = $arr['code'];
+            $data['marital_status'] = $arr['name'];
+        }
+
+        if ($data['health_status']) {
+            $arr = $this->getCodeName($data['health_status']);
+            $data['health_status_code'] = $arr['code'];
+            $data['health_status'] = $arr['name'];
+        }
+
+        if ($data['country']) {
+            $arr = $this->getCodeName($data['country']);
+            $data['country_code'] = $arr['code'];
+            $data['country'] = $arr['name'];
+        }
+
+        if ($data['gatq']) {
+            $arr = $this->getCodeName($data['gatq']);
+            $data['gatq_code'] = $arr['code'];
+            $data['gatq'] = $arr['name'];
+        }
+
+        if ($data['blood_type']) {
+            $arr = $this->getCodeName($data['blood_type']);
+            $data['blood_type_code'] = $arr['code'];
+            $data['blood_type'] = $arr['name'];
+        }
+
+        if ($data['identity_type']) {
+            $arr = $this->getCodeName($data['identity_type']);
+            $data['identity_type_code'] = $arr['code'];
+            $data['identity_type'] = $arr['name'];
+        }
+
+        if ($data['student_type']) {
+            $arr = $this->getCodeName($data['student_type']);
+            $data['student_type_code'] = $arr['code'];
+            $data['student_type'] = $arr['name'];
+        }
+
+        if ($data['dept_code']) {
+            $arr = $this->getCodeName($data['dept_code']);
+            $data['dept_code'] = $arr['code'];
+            $data['dept_name'] = $arr['name'];
+        }
+
+        if ($data['course_code']) {
+            $arr = $this->getCodeName($data['course_code']);
+            $data['course_code'] = $arr['code'];
+            $data['course_name'] = $arr['name'];
+        }
+
+        if ($data['class_code']) {
+            $arr = $this->getCodeName($data['class_code']);
+            $data['class_code'] = $arr['code'];
+            $data['class_name'] = $arr['name'];
+        }
+
+        if ($data['education_code']) {
+            $arr = $this->getCodeName($data['education_code']);
+            $data['education_code'] = $arr['code'];
+            $data['education'] = $arr['name'];
+        }
+
+        if ($data['train_type']) {
+            $arr = $this->getCodeName($data['train_type']);
+            $data['train_type_code'] = $arr['code'];
+            $data['train_type'] = $arr['name'];
+        }
+
+        if ($data['entry_type']) {
+            $arr = $this->getCodeName($data['entry_type']);
+            $data['entry_type_code'] = $arr['code'];
+            $data['entry_type'] = $arr['name'];
+        }
+
+        return $data;
     }
 }

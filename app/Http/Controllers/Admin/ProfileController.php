@@ -46,14 +46,14 @@ class ProfileController extends Controller
             }
 
             try {
-                UserModel::where('id', $user_auth['id'])->update($data);
+                UserModel::where('code', $user_auth['code'])->update($data);
             } catch (\Exception $e) {
                 return responseToJson([], '提交失败：【' . $e->getMessage() . '】', 201);
             }
 
             return responseToJson([], '提交成功');
         }
-        $userinfo = UserModel::findOrFail($user_auth['id']);
+        $userinfo = UserModel::findOrFail($user_auth['code']);
         return view('admin.user.profile', [
             'userinfo' => $userinfo,
         ]);

@@ -14,6 +14,7 @@ class UserModel extends Model
     //
     protected $table = 't_user_account';
     protected $primaryKey = 'code';
+    protected $keyType = 'string';
 
     protected $fillable = [
         'code',

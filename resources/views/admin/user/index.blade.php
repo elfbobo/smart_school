@@ -22,9 +22,9 @@
                             {{--<div class="form-group mr-2">
                                 <button class="btn btn-success" onclick="openIframe('导入', '{{ route('user.import') }}')"><i class="fa fa-plus mr-2"></i> 导入</button>
                             </div>--}}
-                            <div class="form-group mr-2">
+                            {{--<div class="form-group mr-2">
                                 <button class="btn btn-primary" onclick="openIframe('新增', '{{ route('user.create') }}')"><i class="fa fa-plus mr-2"></i> 新增</button>
-                            </div>
+                            </div>--}}
                             <div class="form-group mr-2">
                                 <button class="btn btn-danger" onclick="removeAll('{{ route('user.destroy') }}')"><i class="fa fa-times mr-2"></i> 删除</button>
                             </div>
@@ -87,7 +87,9 @@
                             {{--<td>{{ $item->phone }}</td>
                             <td>{{ $item->telephone }}</td>--}}
                             <td class="text-center">
-                                <button class="btn btn-custom btn-sm btn-icon" onclick="openIframe('编辑', '{{ route('user.edit', ['id' => $item['code']]) }}')"><i class="fa fa-pencil"></i></button>
+                                {{--<button class="btn btn-custom btn-sm btn-icon"
+                                        onclick="openIframe('编辑', '{{ route('user.edit', ['id' => $item['code']]) }}')">
+                                    <i class="fa fa-pencil"></i></button>--}}
                                 <button class="btn btn-danger btn-sm btn-icon" onclick="removeOne('{{ route('user.destroy', ['id' => $item['code']]) }}')"><i class="fa fa-times"></i></button>
                             </td>
                         </tr>

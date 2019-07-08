@@ -12,7 +12,7 @@ class DictModel extends Model
     public static function getData($category)
     {
         return self::where('category', $category)
-            ->orderBy('code')
+            ->orderBy('order')
             ->pluck('name', 'code')
             ->toArray();
     }
