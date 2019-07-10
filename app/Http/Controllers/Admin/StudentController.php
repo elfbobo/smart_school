@@ -8,8 +8,10 @@ use App\Models\Admin\DictModel;
 use App\Models\Admin\ProfessionalModel;
 use App\Models\Admin\RegionModel;
 use App\Models\Admin\StudentModel;
+use App\Models\Admin\UserModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
@@ -24,20 +26,38 @@ class StudentController extends BaseController
     public function index(Request $request)
     {
         //
-        $search = $request->get('search', null);
-        $perPage = $request->get('perpage', 20);
-        $params = [];
-        !is_null($search) ? $params['search'] = $search : null;
-        $data = StudentModel::where(function ($query) {
+        $params = $request->except('perpage');
+        $perpage = $request->get('perpage', 20);
+        if (!empty($params)) {
+            foreach ($params as $column => $value) {
+                if (!strlen($value)) {
+                    unset($params[$column]);
+                }
+            }
+        }
 
+        $data = StudentModel::where(function ($query) use ($params) {
+            if (!empty($params)) {
+                foreach ($params as $column => $value) {
+                    if (strlen($value)) {
+                        if ($column == 'search') {
+                            $query->where('union_id', 'like', '%' . $value . '%')->orWhere('name', 'like', '%' . $value . '%');
+                        } else {
+                            $query->where($column, $value);
+                        }
+                    }
+                }
+            }
         })
             ->select('id','avatar', 'union_id', 'name', 'gender', 'grade', 'dept_name', 'course_name', 'class_name', 'in_registry', 'in_school')
-            ->paginate($perPage);
+            ->paginate($perpage);
         return view('admin.student.index', [
             'params' => $params ? json_encode($params, 320) : '{}',
             'data' => $data,
             'pagelist' => $data->appends($params)->links(),
             'dept' => DepartmentModel::where('category', $this->category)->pluck('name', 'code')->toArray(),
+            'class' => ClassModel::where('status', 1)->pluck('class_name', 'class_code')->toArray(),
+            'course' => ProfessionalModel::orderBy('sort')->pluck('name', 'code')->toArray(),
         ]);
     }
 
@@ -81,9 +101,17 @@ class StudentController extends BaseController
     {
         //
         $data = $this->validation($request->all());
+        DB::beginTransaction();
         try {
             StudentModel::create($data);
+            $account['code'] = $data['union_id'];
+            $account['name'] = $data['name'];
+            $account['type'] = 0;
+            $account['password'] = $data['phone'] ? md5(substr($data['phone'], -6)) : md5('123456');
+            UserModel::create($account);
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->responseToJson([], '新增失败：【' . $e->getMessage() . '】', 201);
         }
 
@@ -145,9 +173,22 @@ class StudentController extends BaseController
     {
         //
         $data = $this->validation($request->all(), $id);
+        DB::beginTransaction();
         try {
             StudentModel::where('id', $id)->update($data);
+            $account['code'] = $data['union_id'];
+            $account['name'] = $data['name'];
+            $account['type'] = 0;
+            $account['password'] = $data['phone'] ? md5(substr($data['phone'], -6)) : md5('123456');
+            $user = UserModel::where('code', $data['union_id'])->where('state', '<>', 2)->first();
+            if ($user) {
+                UserModel::where('code', $user->code)->update(['name' => $data['name']]);
+            } else {
+                UserModel::create($account);
+            }
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->responseToJson([], '编辑失败：【' . $e->getMessage() . '】', 201);
         }
 
@@ -167,9 +208,15 @@ class StudentController extends BaseController
             $id = $request->get('id');
         }
 
+        $id = is_string($id) ? [$id] : $id;
+        $users = StudentModel::whereIn('id', $id)->pluck('union_id')->toArray();
+        DB::beginTransaction();
         try {
             StudentModel::destroy($id);
+            UserModel::whereIn('code', $users)->update(['state' => 2]);
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->responseToJson([], '删除失败：【' . $e->getMessage() . '】', 201);
         }
 
@@ -268,6 +315,19 @@ class StudentController extends BaseController
                         StudentModel::updateOrCreate([
                             'union_id' => $item['union_id'],
                         ], $item);
+
+                        $user = UserModel::where('code', $item['union_id'])->where('state', '<>', 2)->first();
+                        if ($user) {
+                            UserModel::where('code', $user->code)->update(['name' => $item['name']]);
+                        } else {
+                            $account = [
+                                'code' => $item['union_id'],
+                                'name' => $item['name'],
+                                'type' => 1,
+                                'password' => $item['phone'] ? md5(substr($item['phone'], -6)) : md5('123456')
+                            ];
+                            UserModel::create($account);
+                        }
                         $num++;
                     }
                 }

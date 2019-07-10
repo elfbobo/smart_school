@@ -107,7 +107,7 @@ class TeacherController extends BaseController
             $account['code'] = $data['union_id'];
             $account['name'] = $data['name'];
             $account['type'] = 1;
-            $account['password'] = $data['id_card'] ? md5(substr($data['id_card'], -6)) : md5('123456');
+            $account['password'] = $data['phone'] ? md5(substr($data['phone'], -6)) : md5('123456');
             UserModel::create($account);
             DB::commit();
         } catch (\Exception $e) {
@@ -180,7 +180,7 @@ class TeacherController extends BaseController
             $account['code'] = $data['union_id'];
             $account['name'] = $data['name'];
             $account['type'] = 1;
-            $account['password'] = $data['id_card'] ? md5(substr($data['id_card'], -6)) : md5('123456');
+            $account['password'] = $data['phone'] ? md5(substr($data['phone'], -6)) : md5('123456');
 
             $user = UserModel::where('code', $data['union_id'])->where('state', '<>', 2)->first();
             if ($user) {
@@ -209,10 +209,16 @@ class TeacherController extends BaseController
         if ($id == 'delete') {
             $id = $request->get('id');
         }
+        $id = is_string($id) ? [$id] : $id;
 
+        $users = TeacherModel::whereIn('id', $id)->pluck('union_id')->toArray();
+        DB::beginTransaction();
         try {
             TeacherModel::destroy($id);
+            UserModel::whereIn('code', $users)->update(['state' => 2]);
+            DB::commit();
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->responseToJson([], '删除失败', 201);
         }
 
@@ -229,6 +235,7 @@ class TeacherController extends BaseController
                     "职工号" => "union_id",
                     "姓名" => "name",
                     "性别" => "gender",
+                    "手机号" => "phone",
                     "出生日期" => "birthday",
                     "籍贯" => "native_place",
                     "当前状态" => "status_desc",
@@ -304,7 +311,7 @@ class TeacherController extends BaseController
                                     'code' => $item['union_id'],
                                     'name' => $item['name'],
                                     'type' => 1,
-                                    'password' => $item['id_card'] ? md5(substr($item['id_card'], -6)) : md5('123456')
+                                    'password' => $item['phone'] ? md5(substr($item['phone'], -6)) : md5('123456')
                                 ];
                                 UserModel::create($account);
                             }
@@ -361,6 +368,11 @@ class TeacherController extends BaseController
                 'regex:/^[a-z0-9]{4,}$/',
                 is_null($id) ? Rule::unique('t_sys_teacher') : Rule::unique('t_sys_teacher')->ignore($id),
             ],
+            'phone' => [
+                'nullable',
+                'regex:/^1[3456789]\d{9}$/',
+                is_null($id) ? Rule::unique('t_sys_teacher') : Rule::unique('t_sys_teacher')->ignore($id),
+            ],
             'id_card' => [
                 'nullable',
                 'regex:/^[a-z0-9]{6,}$/',
@@ -371,6 +383,8 @@ class TeacherController extends BaseController
         $msg = [
             'union_id.regex' => '职工号必须是字母或数字组成',
             'union_id.unique' => '职工号已存在',
+            'phone.regex' => '手机号格式不正确',
+            'phone.unique' => '手机号已存在',
             'id_card.regex' => '证件号必须是字母或数字组成',
             'id_card.unique' => '证件号码已存在',
         ];

@@ -26,7 +26,7 @@
                         <p class="text-muted">支持png、jpg、jpeg格式，大小不超过1M</p>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-4">
                             <label class="">职工号<span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="union_id"
                                    placeholder="请输入职工号，小写字母或数字组成"
@@ -38,7 +38,7 @@
                             >
                             <p class="form-text text-muted">职工号由小写字母或数字组成，不超过20位</p>
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-4">
                             <label class="">姓名<span class="text-danger">*</span></label>
                             <input type="text" name="name" class="form-control"
                                    placeholder="请输入姓名，长度2-30位"
@@ -47,6 +47,16 @@
                                    value="{{ $info->name }}"
                                    required autocomplete="off">
                             <p class="text-muted m-t-10">请输入姓名，长度2-30位</p>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="">手机号</label>
+                            <input type="text" name="name" class="form-control"
+                                   placeholder="请输手机号"
+                                   minlength="11"
+                                   maxlength="11"
+                                   value="{{ $info->phone }}"
+                                   autocomplete="off"
+                            >
                         </div>
                     </div>
 
