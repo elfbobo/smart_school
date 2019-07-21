@@ -17,6 +17,13 @@ use Illuminate\Validation\Rule;
 
 class AppManageController extends BaseController
 {
+    //卡片类型
+    private $cardType = [
+        4 => '普通卡片',
+        2 => '通知公告',
+        1 => '系统文件夹',
+        3 => '消息中心',
+    ];
     //应用类型
     private $appType = [
         'PC应用',
@@ -134,6 +141,7 @@ class AppManageController extends BaseController
         return view('admin.app_manage.create', [
             'category' => $this->appType,
             'folders' => json_encode($folders),
+            'cardType' => $this->cardType,
         ]);
     }
 
@@ -183,6 +191,7 @@ class AppManageController extends BaseController
             'info' => $info,
             'category' => $this->appType,
             'folders' => json_encode($folders),
+            'cardType' => $this->cardType,
         ]);
     }
 

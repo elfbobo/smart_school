@@ -23,7 +23,7 @@
                     <div class="form-group row">
                         <label class="col-2 col-form-label">应用类型<span class="text-danger">*</span></label>
                         <div class="col-10">
-                            <select name="category" class="form-control" onchange="selectFolder(this.value)">
+                            <select name="category" class="form-control">
                                 @foreach($category as $k => $item)
                                     <option value="{{ $k }}">{{ $item }}</option>
                                 @endforeach
@@ -45,6 +45,17 @@
                         <label class="col-2 col-form-label">应用说明</label>
                         <div class="col-10">
                             <textarea name="description" id="" rows="6" class="form-control"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-2 col-form-label">卡片类型<span class="text-danger">*</span></label>
+                        <div class="col-10">
+                            <select name="card_type" class="form-control" onchange="selectCardType(this.value)">
+                                @foreach($cardType as $k => $type)
+                                    <option value="{{ $k }}">{{ $type }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
 
@@ -301,13 +312,17 @@
             infoTextEmpty: '空',
         });
 
-        function selectFolder(value) {
+        function selectCardType(value) {
             if (value == 2) {
+                $('#entry-url').val('{"type":"notice"}');
+            } else if (value == 3) {
+                $('#entry-url').val('{"type":"message"}');
+            } else if (value == 1) {
                 var folders = {!! $folders !!};
                 var form = '<div class="form-group card-box" style="width: 90%;">' +
-                                '<label>选择文件夹</label>' +
-                                '<select class="form-control">' +
-                                    '<option value="">请选择</option>';
+                    '<label>选择文件夹</label>' +
+                    '<select class="form-control">' +
+                    '<option value="">请选择</option>';
                 if (folders != '') {
                     for (var index in folders) {
                         form += '<option value="'+index+'">'+folders[index]+'</option>'
@@ -332,6 +347,8 @@
                         layer.close(index);
                     }
                 });
+            } else {
+                $('#entry-url').val('');
             }
         }
     </script>

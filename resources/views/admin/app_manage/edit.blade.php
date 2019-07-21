@@ -51,6 +51,17 @@
                     </div>
 
                     <div class="form-group row">
+                        <label class="col-2 col-form-label">卡片类型<span class="text-danger">*</span></label>
+                        <div class="col-10">
+                            <select name="card_type" class="form-control" onchange="selectCardType(this.value)">
+                                @foreach($cardType as $k => $type)
+                                    <option value="{{ $k }}">{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
                         <label class="col-2 col-form-label">入口地址<span class="text-danger">*</span></label>
                         <div class="col-10">
                             <input type="text" name="entry_url" class="form-control"
@@ -298,8 +309,12 @@
             multiPane: false,
         });
 
-        function selectFolder(value) {
+        function selectCardType(value) {
             if (value == 2) {
+                $('#entry-url').val('{"type":"notice"}');
+            } else if (value == 3) {
+                $('#entry-url').val('{"type":"message"}');
+            } else if (value == 1) {
                 var folders = {!! $folders !!};
                 var form = '<div class="form-group card-box" style="width: 90%;">' +
                     '<label>选择文件夹</label>' +
@@ -329,6 +344,8 @@
                         layer.close(index);
                     }
                 });
+            } else {
+                $('#entry-url').val('');
             }
         }
     </script>
