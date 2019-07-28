@@ -31,7 +31,7 @@
                     <div class="form-group row">
                         <label for="" class="col-2 col-form-label">选择用户</label>
                         <div class="col-10">
-                            <select name="users[]" id="" class="select2" multiple data-placeholder="选择用户">
+                            <select name="users[]" id="my-select" class="form-control" multiple data-placeholder="选择用户">
                                 @foreach($users as $user)
                                     <option value="{{ $user->code }}">{{ $user->name . '(' . $user->code . ')' }}</option>
                                 @endforeach
@@ -71,6 +71,23 @@
             Parsley.on('form:submit', function(e) {
                 var formData = $('form').serializeObject();
                 return postFormData(formData, '{{ route('role.store') }}')
+            });
+
+            //多选框
+            $("#my-select").bootstrapDualListbox({
+                nonSelectedListLabel: false,
+                selectedListLabel: false,
+                filterTextClear: '全部',
+                filterPlaceHolder: '过滤条件',
+                preserveSelectionOnMove: 'moved',
+                moveOnSelect: true,
+                moveAllLabel: '添加全部',
+                moveSelectedLabel: '添加选中',
+                removeAllLabel: '移除全部',
+                removeSelectedLabel: '移除选中',
+                infoText: '选中/未选中共 {0} 项',
+                infoTextFiltered: '从 {1} 项 筛选 {0} 项',
+                infoTextEmpty: '空',
             });
         });
     </script>

@@ -18,18 +18,8 @@
 
                 <div class="mb-3">
                     <div class="row">
-                        <div class="col-12 text-sm-center form-inline">
-                            <div class="form-group mr-2">
-                                <button class="btn btn-success" onclick="openIframe('导入', '{{ route('teacher.import') }}')"><i class="fa fa-upload mr-2"></i> 导入</button>
-                            </div>
-                            <div class="form-group mr-2">
-                                <a class="btn btn-primary" href="{{ route('teacher.create') }}"><i class="fa fa-plus mr-2"></i> 新增</a>
-                            </div>
-                            <div class="form-group mr-2">
-                                <button class="btn btn-danger" onclick="removeAll('{{ route('teacher.destroy') }}')"><i class="fa fa-times mr-2"></i> 删除</button>
-                            </div>
+                        <div class="col-12 form-inline m-b-30">
                             <form class="form-inline" id="search-form">
-
                                 <div class="form-group mr-2">
                                     <select name="gender" id="" class="form-control" onchange="searchValue(this.value, 'gender')">
                                         <option value="">选择性别</option>
@@ -69,6 +59,17 @@
                                     <button class="btn btn-primary "><i class="fa fa-search mr-2"></i> 搜索</button>
                                 </div>
                             </form>
+                        </div>
+                        <div class="col-12 text-sm-center form-inline">
+                            <div class="form-group mr-2">
+                                <button class="btn btn-success" onclick="openIframe('导入', '{{ route('teacher.import') }}')"><i class="fa fa-upload mr-2"></i> 导入</button>
+                            </div>
+                            <div class="form-group mr-2">
+                                <a class="btn btn-primary" href="{{ route('teacher.create') }}"><i class="fa fa-plus mr-2"></i> 新增</a>
+                            </div>
+                            <div class="form-group mr-2">
+                                <button class="btn btn-danger" onclick="removeAll('{{ route('teacher.destroy') }}')"><i class="fa fa-times mr-2"></i> 删除</button>
+                            </div>
                         </div>
                     </div>
                 </div>

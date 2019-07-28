@@ -19,7 +19,7 @@
                 <div class="mb-3">
                     <div class="row">
                         <form class="form-inline" id="search-form">
-                            <div class="col-12 text-sm-center form-inline m-b-30">
+                            <div class="col-12 text-sm-center form-inline" style="margin-bottom: 15px;">
                                 <div class="form-group mr-2">
                                     <select name="gender" id="" class="form-control"
                                             onchange="searchValue(this.value, 'gender')">
@@ -29,7 +29,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group mr-2">
-                                    <select name="dept_id" id="dept-id" class="form-control select2"
+                                    <select name="dept_code" id="dept-id" class="form-control select2"
                                             data-placeholder="所属系部"
                                             data-allow-clear="true"
                                             onchange="searchValue(this.value, 'dept_code')">
@@ -40,7 +40,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group mr-2">
-                                    <select name="" id="dept-id" class="form-control select2"
+                                    <select name="course_code" id="dept-id" class="form-control select2"
                                             data-placeholder="所属专业"
                                             data-allow-clear="true"
                                             onchange="searchValue(this.value, 'course_code')">
@@ -51,7 +51,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group mr-2">
-                                    <select name="is_prepare" id=""
+                                    <select name="grade" id=""
                                             class="form-control select2"
                                             data-placeholder="选择年级"
                                             data-allow-clear="true"
@@ -65,7 +65,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group mr-2">
-                                    <select name="is_prepare" id=""
+                                    <select name="class_code" id=""
                                             class="form-control select2"
                                             data-placeholder="选择班级"
                                             data-allow-clear="true"
@@ -79,7 +79,7 @@
                             </div>
                             <div class="col-12 text-sm-center form-inline m-b-30">
                                 <div class="form-group mr-2">
-                                    <select name="gender" id="" class="form-control"
+                                    <select name="in_registry" id="" class="form-control"
                                             onchange="searchValue(this.value, 'in_registry')">
                                         <option value="">是否在籍</option>
                                         <option value="1" {{ request('in_registry')=='1'?'selected':'' }}>是</option>
@@ -87,7 +87,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group mr-2">
-                                    <select name="gender" id="" class="form-control"
+                                    <select name="in_school" id="" class="form-control"
                                             onchange="searchValue(this.value, 'in_school')">
                                         <option value="">是否在校</option>
                                         <option value="1" {{ request('in_school')=='1'?'selected':'' }}>是</option>
