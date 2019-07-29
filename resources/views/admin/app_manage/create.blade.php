@@ -253,9 +253,11 @@
             });
 
 
-            var upload = uploadFile('.filestyle', '/api/upload');
+            var upload = new uploadFile('.filestyle', '/api/upload');
+            upload.setMaxFileSize(1024*1024);
+            upload.init();
             //上传请求失败时触发的回调函数
-            upload.on("fileuploadfail", function(e, data) {
+            upload.btInstance.on("fileuploadfail", function(e, data) {
                 layer.msg('上传失败');
             })
             //上传请求成功时触发的回调函数
