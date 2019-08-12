@@ -335,9 +335,12 @@ class StudentController extends BaseController
                 exit($this->responseToJson(['errors' => $errors ?? []], '本次导入成功' . $num . '条，导入失败' . ($count - $num) . '条', 200, false));
             });
         }
+
+        $tips = '<li>学号和姓名为必填项</li>';
         return view('admin.import', [
             'export_url' => route('student.import'),
-            'template' => 'student.xls'
+            'template' => 'student.xls',
+            'tips' => $tips,
         ]);
     }
 

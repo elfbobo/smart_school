@@ -264,18 +264,25 @@ class TeacherController extends BaseController
                                 unset($item[$k]);
                             }
 
-                            $dept = DepartmentModel::where('name', $item['dept_id'])->first();
-                            if (!$dept) {
-                                $errors[$key] = '第' . ($key + 1) . '行，所属部门不存在';
+                            if (!$item['union_id'] || !$item['name'] || !$item['gender'] || !$item['phone']) {
+                                $errors[$key] = '第' . ($key + 1) . '行，数据不完整！';
                                 continue;
                             }
-                            $item['dept_id'] = $dept->id;
-                            $dept = DepartmentModel::where('name', $item['dept_sec_id'])->first();
-                            if (!$dept) {
-                                $errors[$key] = '第' . ($key + 1) . '行，所属二级部门不存在';
-                                continue;
+
+                            if ($item['dept_id']) {
+                                $dept = DepartmentModel::where('name', $item['dept_id'])->first();
+                                if ($dept) {
+                                    $item['dept_id'] = $dept->id;
+                                }
                             }
-                            $item['dept_sec_id'] = $dept->id;
+
+                            if ($item['dept_sec_id']) {
+                                $dept = DepartmentModel::where('name', $item['dept_sec_id'])->first();
+                                if ($dept) {
+                                    $item['dept_sec_id'] = $dept->id;
+                                }
+                            }
+
 
                             $item['gender'] = $item['gender'] == '男' ? 1 : 2;
                             $item['is_prepare'] = $item['is_prepare'] == '在编' ? 1 : 0;
@@ -326,9 +333,13 @@ class TeacherController extends BaseController
                 exit($this->responseToJson(['errors' => $errors ?? []], '本次导入成功' . $num . '条，导入失败' . ($count - $num) . '条', 200, false));
             });
         }
+
+        $tips = '<li>职工号|姓名|性别|手机号均为必填项</li>';
+        $tips .= '<li>职工号初始密码为手机号后6位</li>';
         return view('admin.import', [
             'export_url' => route('teacher.import'),
-            'template' => 'teacher.xls'
+            'template' => 'teacher.xls',
+            'tips' => $tips,
         ]);
     }
 
