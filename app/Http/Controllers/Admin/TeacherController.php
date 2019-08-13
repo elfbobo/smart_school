@@ -325,6 +325,7 @@ class TeacherController extends BaseController
                             $num++;
                             DB::commit();
                         } catch (\Exception $e) {
+                            $errors[$key] = '第' . ($key + 1) . '行，' . $e->getMessage();
                             DB::rollBack();
                         }
                     }
