@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Admin\RoleModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -114,5 +115,10 @@ class BaseController extends Controller
             'code' => $arr[0] ?? '',
             'name' => $arr[1] ?? '',
         ];
+    }
+
+    protected function getRoleId($roleCode)
+    {
+        return RoleModel::where('code', $roleCode)->value('id');
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Admin\DictModel;
 use App\Models\Admin\RegionModel;
 use App\Models\Admin\TeacherModel;
 use App\Models\Admin\UserModel;
+use App\Models\Admin\UserRoleModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -16,6 +17,8 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TeacherController extends BaseController
 {
+    private $roleCode = 'teacher';
+
     /**
      * Display a listing of the resource.
      *
@@ -50,6 +53,7 @@ class TeacherController extends BaseController
                     : null;
             })
             ->select('a.*', 'b.name as dept_name')
+            ->orderBy('a.updated_at', 'desc')
             ->paginate($perPage);
         return view('admin.teacher.index', [
             'data' => $data,
@@ -109,6 +113,11 @@ class TeacherController extends BaseController
             $account['type'] = 1;
             $account['password'] = $data['phone'] ? md5(substr($data['phone'], -6)) : md5('123456');
             UserModel::create($account);
+
+            UserRoleModel::create([
+                'user_code' => $data['union_id'],
+                'role_id' => $this->getRoleId($this->roleCode),
+            ]);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -188,6 +197,14 @@ class TeacherController extends BaseController
             } else {
                 UserModel::create($account);
             }
+
+            UserRoleModel::updateOrCreate([
+                'user_code' => $data['union_id'],
+                'role_id' => $this->getRoleId($this->roleCode),
+            ], [
+                'user_code' => $data['union_id'],
+                'role_id' => $this->getRoleId($this->roleCode),
+            ]);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -310,6 +327,7 @@ class TeacherController extends BaseController
                                 'union_id' => $item['union_id'],
                             ], $item);
 
+                            //写入账号表
                             $user = UserModel::where('code', $item['union_id'])->where('state', '<>', 2)->first();
                             if ($user) {
                                 UserModel::where('code', $user->code)->update(['name' => $item['name']]);
@@ -322,6 +340,15 @@ class TeacherController extends BaseController
                                 ];
                                 UserModel::create($account);
                             }
+
+                            //加入教师角色关联表
+                            UserRoleModel::updateOrCreate([
+                                'user_code' => $item['union_id'],
+                                'role_id' => $this->getRoleId($this->roleCode),
+                            ], [
+                                'user_code' => $item['union_id'],
+                                'role_id' => $this->getRoleId($this->roleCode),
+                            ]);
                             $num++;
                             DB::commit();
                         } catch (\Exception $e) {

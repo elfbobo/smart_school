@@ -9,6 +9,7 @@ use App\Models\Admin\ProfessionalModel;
 use App\Models\Admin\RegionModel;
 use App\Models\Admin\StudentModel;
 use App\Models\Admin\UserModel;
+use App\Models\Admin\UserRoleModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,8 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class StudentController extends BaseController
 {
+    private $roleCode = 'student';
+
     /**
      * Display a listing of the resource.
      *
@@ -50,6 +53,7 @@ class StudentController extends BaseController
             }
         })
             ->select('id','avatar', 'union_id', 'name', 'gender', 'grade', 'dept_name', 'course_name', 'class_name', 'in_registry', 'in_school')
+            ->orderBy('updated_at', 'desc')
             ->paginate($perpage);
         return view('admin.student.index', [
             'params' => $params ? json_encode($params, 320) : '{}',
@@ -109,6 +113,11 @@ class StudentController extends BaseController
             $account['type'] = 0;
             $account['password'] = $data['phone'] ? md5(substr($data['phone'], -6)) : md5('123456');
             UserModel::create($account);
+
+            UserRoleModel::create([
+                'user_code' => $data['union_id'],
+                'role_id' => $this->getRoleId($this->roleCode),
+            ]);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -186,6 +195,14 @@ class StudentController extends BaseController
             } else {
                 UserModel::create($account);
             }
+
+            UserRoleModel::updateOrCreate([
+                'user_code' => $data['union_id'],
+                'role_id' => $this->getRoleId($this->roleCode),
+            ], [
+                'user_code' => $data['union_id'],
+                'role_id' => $this->getRoleId($this->roleCode),
+            ]);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -302,36 +319,50 @@ class StudentController extends BaseController
                 $num = 0;
                 if ($data) {
                     foreach ($data as $key => $item) {
-                        foreach ($item as $k => $v) {
-                            $item[$header[$k]] = $v;
-                            unset($item[$k]);
-                        }
+                        DB::beginTransaction();
+                        try {
+                            foreach ($item as $k => $v) {
+                                $item[$header[$k]] = $v;
+                                unset($item[$k]);
+                            }
 
-                        if (!$item['union_id'] || !$item['name']) {
-                            $errors[$key] = '第' . ($key + 1) . '行，数据不完整';
-                            continue;
-                        }
+                            if (!$item['union_id'] || !$item['name']) {
+                                $errors[$key] = '第' . ($key + 1) . '行，数据不完整';
+                                continue;
+                            }
 
-                        StudentModel::updateOrCreate([
-                            'union_id' => $item['union_id'],
-                        ], $item);
+                            StudentModel::updateOrCreate([
+                                'union_id' => $item['union_id'],
+                            ], $item);
 
-                        $user = UserModel::where('code', $item['union_id'])->where('state', '<>', 2)->first();
-                        if ($user) {
-                            UserModel::where('code', $user->code)->update(['name' => $item['name']]);
-                        } else {
-                            $account = [
-                                'code' => $item['union_id'],
-                                'name' => $item['name'],
-                                'type' => 1,
-                                'password' => $item['phone'] ? md5(substr($item['phone'], -6)) : md5('123456')
-                            ];
-                            UserModel::create($account);
+                            $user = UserModel::where('code', $item['union_id'])->where('state', '<>', 2)->first();
+                            if ($user) {
+                                UserModel::where('code', $user->code)->update(['name' => $item['name']]);
+                            } else {
+                                $account = [
+                                    'code' => $item['union_id'],
+                                    'name' => $item['name'],
+                                    'type' => 1,
+                                    'password' => $item['phone'] ? md5(substr($item['phone'], -6)) : md5('123456')
+                                ];
+                                UserModel::create($account);
+                            }
+
+                            UserRoleModel::updateOrCreate([
+                                'user_code' => $item['union_id'],
+                                'role_id' => $this->getRoleId($this->roleCode),
+                            ], [
+                                'user_code' => $item['union_id'],
+                                'role_id' => $this->getRoleId($this->roleCode),
+                            ]);
+                            $num++;
+                            DB::commit();
+                        } catch (\Exception $e) {
+                            DB::rollBack();
+                            $errors[$key] = '第' . ($key + 1) . '行，导入失败：' . $e->getMessage();
                         }
-                        $num++;
                     }
                 }
-
                 exit($this->responseToJson(['errors' => $errors ?? []], '本次导入成功' . $num . '条，导入失败' . ($count - $num) . '条', 200, false));
             });
         }

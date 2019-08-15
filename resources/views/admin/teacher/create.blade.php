@@ -43,7 +43,7 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label class="">手机号</label>
-                            <input type="text" name="name" class="form-control"
+                            <input type="text" name="phone" class="form-control"
                                    placeholder="请输手机号"
                                    minlength="11"
                                    maxlength="11" autocomplete="off">
@@ -161,8 +161,8 @@
                             </select>
                         </div>
                         <div class="form-group col-md-6">
-                            <label class="">当前状态</label>
-                            <select name="status" id="province" class="form-control select2">
+                            <label class="">当前状态<span class="text-danger">*</span></label>
+                            <select name="status" id="province" class="form-control select2" required>
                                 <option value=""></option>
                                 @foreach($status as $code => $v)
                                     <option value="{{ $code . '|' . $v }}">{{ '['. $code .']' . $v }}</option>
