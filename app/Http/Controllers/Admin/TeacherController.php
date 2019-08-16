@@ -43,14 +43,15 @@ class TeacherController extends BaseController
         $data = TeacherModel::from('t_sys_teacher as a')
             ->leftJoin('t_department as b', 'b.id', '=', 'a.dept_id')
             ->where(function ($query) use ($params) {
+                isset($params['search']) ?
+                    $query->where('union_id', 'like', '%' . $params['search'] . '%')
+                        ->orWhere('a.name', 'like', '%' . $params['search'] . '%')
+                    : null;
                 isset($params['gender']) ? $query->where('gender', $params['gender']) : null;
                 isset($params['status']) ? $query->where('a.status', $params['status']) : null;
                 isset($params['is_prepare']) ? $query->where('is_prepare', $params['is_prepare']) : null;
-                isset($params['dept_id']) ? $query->where('dept_id', $params['dept_id']) : null;
-                isset($params['search']) ?
-                    $query->where('union_id', $params['search'])
-                        ->orWhere('name', $params['search'])
-                    : null;
+                isset($params['dept_id']) ? $query->where('a.dept_id', $params['dept_id']) : null;
+
             })
             ->select('a.*', 'b.name as dept_name')
             ->orderBy('a.updated_at', 'desc')
