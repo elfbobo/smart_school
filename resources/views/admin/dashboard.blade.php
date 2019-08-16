@@ -18,99 +18,36 @@
     </div>
     <!-- end page title end breadcrumb -->
 
-   {{-- <div class="row">
-        <div class="col-lg-6">
-            <div class="card-box">
-                <h4 class="header-title">Line Chart</h4>
-
-                <canvas id="lineChart" height="350" class="mt-4"></canvas>
+    <div class="row">
+        <div class="col-xs-12 col-md-6 col-lg-6 col-xl-3">
+            <div class="card-box tilebox-one">
+                <i class="icon-people float-right text-muted"></i>
+                <h6 class="text-muted text-uppercase mt-0">教职工总数</h6>
+                <h2 class="m-b-20" data-plugin="counterup">{{ $teacherCount }}</h2>
             </div>
         </div>
-        <div class="col-lg-6">
-            <div class="card-box">
-                <h4 class="header-title">Bar Chart</h4>
-
-                <canvas id="bar" height="350" class="mt-4"></canvas>
+        <div class="col-xs-12 col-md-6 col-lg-6 col-xl-3">
+            <div class="card-box tilebox-one">
+                <i class="icon-graduation float-right text-muted"></i>
+                <h6 class="text-muted text-uppercase mt-0">学生总数</h6>
+                <h2 class="m-b-20" data-plugin="counterup">{{ $studentCount }}</h2>
             </div>
         </div>
-    </div>--}}
-    <!-- end row -->
-
-    {{--<div class="row">
-        <div class="col-lg-4">
-            <div class="card-box">
-                <h4 class="header-title">本月节目数（单位：条）</h4>
-
-                <canvas id="pie" height="350" class="mt-4"></canvas>
-
+        <div class="col-xs-12 col-md-6 col-lg-6 col-xl-3">
+            <div class="card-box tilebox-one">
+                <i class="icon-tag float-right text-muted"></i>
+                <h6 class="text-muted text-uppercase mt-0">应用数量</h6>
+                <h2 class="m-b-20" data-plugin="counterup">{{ $appCount }}</h2>
             </div>
         </div>
-
-        <div class="col-lg-4">
-            <div class="card-box">
-                <h4 class="header-title">本月节目时长（单位：秒）</h4>
-                <canvas id="doughnut" height="350" class="mt-4"></canvas>
+        <div class="col-xs-12 col-md-6 col-lg-6 col-xl-3">
+            <div class="card-box tilebox-one">
+                <i class="icon-layers float-right text-muted"></i>
+                <h6 class="text-muted text-uppercase mt-0">访问量</h6>
+                <h2 class="m-b-20" data-plugin="counterup">0</h2>
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="card-box">
-                <h4 class="header-title">本月最高得分排名</h4>
-                <div style="height: 365px;">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>名字</th>
-                                <th>时长</th>
-                                <th>编导</th>
-                                <th>得分</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        --}}{{--@if($data->isNotEmpty())
-                            @foreach($data as $item)
-                            <tr>
-                                <td data-toggle="tooltip"
-                                    data-placement="top"
-                                    data-original-title="{{ $item->title }}">{{ str_limit($item->title, 15, '...') }}
-                                </td>
-                                <td>{{ secToTime($item->duration) }}</td>
-                                <td>{{ $item->director_name }}</td>
-                                <td>{{ $item->total_score }}</td>
-                            </tr>
-                            @endforeach
-                        @endif--}}{{--
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>--}}
-    <!-- end row -->
-
-
-    {{--<div class="row">
-
-        <div class="col-lg-6">
-
-            <div class="card-box">
-                <h4 class="header-title">本月记者得分</h4>
-
-                <canvas id="bar" height="350" class="mt-4"> </canvas>
-
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <div class="card-box">
-                <h4 class="header-title">本月团队得分</h4>
-
-                <canvas id="bar1" height="350" class="mt-4"></canvas>
-
-            </div>
-        </div>
-
-    </div>--}}
-    <!-- end row -->
+    </div>
 @endsection
 @section('before-js')
     <!-- Flot chart -->
