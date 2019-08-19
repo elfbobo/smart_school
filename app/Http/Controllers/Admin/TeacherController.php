@@ -43,15 +43,17 @@ class TeacherController extends BaseController
         $data = TeacherModel::from('t_sys_teacher as a')
             ->leftJoin('t_department as b', 'b.id', '=', 'a.dept_id')
             ->where(function ($query) use ($params) {
-                isset($params['search']) ?
-                    $query->where('union_id', 'like', '%' . $params['search'] . '%')
-                        ->orWhere('a.name', 'like', '%' . $params['search'] . '%')
-                    : null;
                 isset($params['gender']) ? $query->where('gender', $params['gender']) : null;
                 isset($params['status']) ? $query->where('a.status', $params['status']) : null;
                 isset($params['is_prepare']) ? $query->where('is_prepare', $params['is_prepare']) : null;
                 isset($params['dept_id']) ? $query->where('a.dept_id', $params['dept_id']) : null;
 
+            })
+            ->where(function ($query) use ($params) {
+                isset($params['search']) ?
+                    $query->where('union_id', 'like', '%' . $params['search'] . '%')
+                        ->orWhere('a.name', 'like', '%' . $params['search'] . '%')
+                    : null;
             })
             ->select('a.*', 'b.name as dept_name')
             ->orderBy('a.updated_at', 'desc')
@@ -250,23 +252,23 @@ class TeacherController extends BaseController
             $file = $request->file('files');
             Excel::selectSheetsByIndex(0)->load($file->getPathname(), function ($reader) {
                 $header = [
-                    "职工号" => "union_id",
-                    "姓名" => "name",
-                    "性别" => "gender",
-                    "手机号" => "phone",
-                    "出生日期" => "birthday",
-                    "籍贯" => "native_place",
-                    "当前状态" => "status_desc",
-                    "编制属性" => "is_prepare",
-                    "所属部门学部" => "dept_id",
-                    "所属二级部门科室" => "dept_sec_id",
-                    "政治面貌" => "politics_status_desc",
-                    "任职资格名称" => "qualification_desc",
-                    "职称级别" => "titles_desc",
-                    "最高学历" => "education_desc",
-                    "最高学位" => "degree_desc",
-                    "身份证件类型" => "id_type_desc",
-                    "证件号码" => "id_card",
+                    "union_id",
+                    "name",
+                    "gender",
+                    "phone",
+                    "birthday",
+                    "native_place",
+                    "status_desc",
+                    "is_prepare",
+                    "dept_id",
+                    "dept_sec_id",
+                    "politics_status_desc",
+                    "qualification_desc",
+                    "titles_desc",
+                    "education_desc",
+                    "degree_desc",
+                    "id_type_desc",
+                    "id_card",
                 ];
 
                 $data = $reader->get()->toArray();

@@ -29,8 +29,9 @@ class StudentController extends BaseController
     public function index(Request $request)
     {
         //
-        $params = $request->except('perpage');
+        $params = $request->except(['perpage', 'page', 'search']);
         $perpage = $request->get('perpage', 20);
+        $search = $request->get('search', null);
         if (!empty($params)) {
             foreach ($params as $column => $value) {
                 if (!strlen($value)) {
@@ -43,18 +44,22 @@ class StudentController extends BaseController
             if (!empty($params)) {
                 foreach ($params as $column => $value) {
                     if (strlen($value)) {
-                        if ($column == 'search') {
-                            $query->where('union_id', 'like', '%' . $value . '%')->orWhere('name', 'like', '%' . $value . '%');
-                        } else {
-                            $query->where($column, $value);
-                        }
+                        $query->where($column, $value);
                     }
                 }
             }
         })
-            ->select('id','avatar', 'union_id', 'name', 'gender', 'grade', 'dept_name', 'course_name', 'class_name', 'in_registry', 'in_school')
+            ->where(function ($query) use ($search) {
+                if ($search) {
+                    $query->where('union_id', 'like', '%' . $search . '%')
+                        ->orWhere('name', 'like', '%' . $search . '%');
+                }
+            })
+            ->select('id', 'avatar', 'union_id', 'name', 'gender', 'grade', 'dept_name', 'course_name', 'class_name', 'in_registry', 'in_school')
             ->orderBy('updated_at', 'desc')
             ->paginate($perpage);
+
+        !is_null($search) ? $params['search'] = $search : null;
         return view('admin.student.index', [
             'params' => $params ? json_encode($params, 320) : '{}',
             'data' => $data,
@@ -247,71 +252,71 @@ class StudentController extends BaseController
             $file = $request->file('files');
             Excel::selectSheetsByIndex(0)->load($file->getPathname(), function ($reader) {
                 $header = [
-                    "学号" => "union_id",
-                    "姓名" => 'name',
-                    "一卡通号" => "card_number",
-                    "学籍号" => "school_roll_code",
-                    "姓名拼音" => "name_py",
-                    "曾用名" => "used_name",
-                    "性别" => "gender",
-                    "出生日期" => "birthday",
-                    "证件类型" => "id_type",
-                    "证件号码" => "id_card",
-                    "民族" => "nation",
-                    "政治面貌" => "politics_status",
-                    "宗教信仰" => "religion",
-                    "婚姻状况" => "marital_status",
-                    "健康状况" => "health_status",
-                    "来源国别" => "country",
-                    "籍贯" => "birthplace",
-                    "港澳台侨" => "gatq",
-                    "户口性质" => "hkxz",
-                    "户口所在地" => "hkszd",
-                    "银行卡号" => "bank_card",
-                    "户籍所在街镇名称" => "hjszjzmc",
-                    "户籍所在居委会(村委会)名称" => "hjszcwhmc",
-                    "血型" => "blood_type",
-                    "身份标识" => "identity_type",
-                    "身高(cm)" => "height",
-                    "体重(kg)" => "weight",
-                    "特长" => "specialty",
-                    "学生类别" => "student_type",
-                    "所在年级" => "grade",
-                    "所在学部" => "dept_name",
-                    "所在专业" => "course_name",
-                    "所在班级" => "class_name",
-                    "就读学历" => "education",
-                    "学制" => "shooling_length",
-                    "是否在籍" => "in_registry",
-                    "是否在校" => "in_school",
-                    "培养方式" => "train_type",
-                    "入学日期" => "entry_date",
-                    "何省市报考" => "enroll_province_city",
-                    "生源地" => "student_source_place",
-                    "考生号" => "candidate_number",
-                    "准考证号" => "pass_number",
-                    "入学前单位" => "entry_before_unit",
-                    "入学年级" => "entry_grade",
-                    "入学学部" => "entry_dept_name",
-                    "入学专业" => "entry_course",
-                    "入学方式" => "entry_type",
-                    "学生来源" => "student_source",
-                    "入学总成绩" => "total_score",
-                    "预计毕业年份" => "graduate_year",
-                    "实际毕业时间" => "graduate_date",
-                    "毕业评语（最多1000 字）" => "graduate_comments",
-                    "通讯地址" => "address",
-                    "通讯邮编" => "zip_code",
-                    "家庭地址" => "home_address",
-                    "家庭邮编" => "home_zip_code",
-                    "家庭电话" => "home_tel",
-                    "个人邮箱" => "email",
-                    "个人手机号" => "phone",
-                    "联系电话" => "tel",
-                    "QQ" => "qq",
-                    "MSN" => "msn",
-                    "个人主页" => "personal_home_page",
-                    "备注（最多300字）" => "remark",
+                    "union_id",
+                    'name',
+                    "card_number",
+                    "school_roll_code",
+                    "name_py",
+                    "used_name",
+                    "gender",
+                    "birthday",
+                    "id_type",
+                    "id_card",
+                    "nation",
+                    "politics_status",
+                    "religion",
+                    "marital_status",
+                    "health_status",
+                    "country",
+                    "birthplace",
+                    "gatq",
+                    "hkxz",
+                    "hkszd",
+                    "bank_card",
+                    "hjszjzmc",
+                    "hjszcwhmc",
+                    "blood_type",
+                    "identity_type",
+                    "height",
+                    "weight",
+                    "specialty",
+                    "student_type",
+                    "grade",
+                    "dept_name",
+                    "course_name",
+                    "class_name",
+                    "education",
+                    "shooling_length",
+                    "in_registry",
+                    "in_school",
+                    "train_type",
+                    "entry_date",
+                    "enroll_province_city",
+                    "student_source_place",
+                    "candidate_number",
+                    "pass_number",
+                    "entry_before_unit",
+                    "entry_grade",
+                    "entry_dept_name",
+                    "entry_course",
+                    "entry_type",
+                    "student_source",
+                    "total_score",
+                    "graduate_year",
+                    "graduate_date",
+                    "graduate_comments",
+                    "address",
+                    "zip_code",
+                    "home_address",
+                    "home_zip_code",
+                    "home_tel",
+                    "email",
+                    "phone",
+                    "tel",
+                    "qq",
+                    "msn",
+                    "personal_home_page",
+                    "remark",
                 ];
 
                 $data = $reader->get()->toArray();
