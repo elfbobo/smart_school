@@ -31,5 +31,6 @@ class AppListModel extends Model
         'version_code',
         'version_name',
         'first_pinyin',
+        'sort',
     ];
 }

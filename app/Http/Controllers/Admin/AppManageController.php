@@ -72,15 +72,23 @@ class AppManageController extends BaseController
         //
         $requestParams = $request->all();
         $perPage = $request->get('perpage', config('custom.perPage'));
+        if (!empty($requestParams)) {
+            foreach ($requestParams as $column => $value) {
+                if (!strlen($value)) {
+                    unset($requestParams[$column]);
+                }
+            }
+        }
         $data = AppListModel::from('t_app_list as a')
             //->join('t_app_service_app as b', 'b.app_id', '=', 'a.id')
             //->leftJoin('t_service_type as c', 'c.id', 'b.service_type_id')
             ->where(function ($query) use ($requestParams) {
-            //关键字搜索
-            if (isset($requestParams['search']) && $requestParams['search']) {
-                $query->where('name', 'like', '%' . $requestParams['search'] . '%');
-            }
-
+                //关键字搜索
+                if (isset($requestParams['search']) && $requestParams['search']) {
+                    $query->where('name', 'like', '%' . $requestParams['search'] . '%');
+                }
+            })
+            ->where(function ($query) use ($requestParams) {
             //应用类型搜索
             if (isset($requestParams['app_type']) && $requestParams['app_type']) {
                 //$field = $this->appTypeValue[$requestParams['app_type']];
@@ -114,6 +122,7 @@ class AppManageController extends BaseController
             }*/
         })
             //->select('a.*', 'c.name as service_name')
+            ->orderBy('sort')
             ->paginate($perPage);
         $service_type = ServiceTypeModel::where('state', 0)->select('id', 'parent_id as pid', 'name as title')->get()->toArray();
         $service_type = PHPTree::toList($service_type);
@@ -156,6 +165,7 @@ class AppManageController extends BaseController
         //
         $data = $this->validation($request->post());
         $data['id'] = $this->getUUID();
+        $data['sort'] = $data['sort'] + 1;
         try {
             AppListModel::create($data);
         } catch (\Exception $e) {

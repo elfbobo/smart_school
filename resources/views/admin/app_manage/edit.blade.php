@@ -233,6 +233,17 @@
                     </div>
 
                     <div class="form-group row">
+                        <label class="col-2 col-form-label">排序<span class="text-danger">*</span></label>
+                        <div class="col-10">
+                            <input type="number" class="form-control" name="sort"
+                                   placeholder="数字越小越靠前"
+                                   value="{{ $info->sort ?: '100' }}"
+                                   autocomplete="off" required>
+                            <p class="form-text text-muted">数字越小越靠前</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
                         <div class="col-10 offset-2">
                             <input type="hidden" name="icon_url" id="avatar" value="{{ $info->icon_url }}">
                             <button type="submit" class="btn btn-custom waves-effect waves-light">
