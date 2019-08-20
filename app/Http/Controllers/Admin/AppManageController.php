@@ -32,13 +32,6 @@ class AppManageController extends BaseController
         '移动卡片',
     ];
 
-    private $appTypeValue = [
-        'pc' => 'is_pc_app',
-        'mobile' => 'is_mobile_app',
-        'pccard' => 'has_pc_card',
-        'mobilecard' => 'has_mobile_card',
-    ];
-
     //应用属性
     private $appAttr = [
         'new' => '新应用',
@@ -142,10 +135,12 @@ class AppManageController extends BaseController
     {
         //
         $folders = AppFolderManageModel::where('state', 0)->pluck('name', 'id')->toArray();
+        $nextSortId = AppListModel::max('sort')+1;
         return view('admin.app_manage.create', [
             'category' => $this->appType,
             'folders' => json_encode($folders),
             'cardType' => $this->cardType,
+            'nextSortId' => $nextSortId,
         ]);
     }
 

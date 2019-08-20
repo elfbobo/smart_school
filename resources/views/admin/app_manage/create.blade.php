@@ -227,7 +227,7 @@
                         <div class="col-10">
                             <input type="number" class="form-control" name="sort"
                                    placeholder="数字越小越靠前"
-                                   value="100"
+                                   value="{{ $nextSortId }}"
                                    autocomplete="off" required>
                             <p class="form-text text-muted">数字越小越靠前</p>
                         </div>
