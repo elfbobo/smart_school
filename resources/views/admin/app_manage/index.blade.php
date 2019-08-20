@@ -85,7 +85,7 @@
                                         <option value="">服务类别</option>
                                         @if(!empty($service_type))
                                             @foreach($service_type as $item)
-                                                <option value="{{ $item['id'] }}">{{ $item['title_display'] }}</option>
+                                                <option value="{{ $item['id'] }}" {{ request('service_type')==$item['id']?'selected':'' }}>{{ $item['title_display'] }}</option>
                                             @endforeach
                                         @endif
                                     </select>
@@ -196,9 +196,9 @@
                                 <div class="btn-group mb-2">
                                     <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown">{{ request()->get('perpage') }}</button>
                                     <div class="dropdown-menu" x-placement="bottom-start" style="">
-                                        <a class="dropdown-item" href="{{ route('user.index', array_merge($params, ['perpage' => 20])) }}">20</a>
-                                        <a class="dropdown-item" href="{{ route('user.index', array_merge($params, ['perpage' => 50])) }}">50</a>
-                                        <a class="dropdown-item" href="{{ route('user.index', array_merge($params, ['perpage' => 100])) }}">100</a>
+                                        <a class="dropdown-item" href="javascript:;" onclick="searchValue(20, 'perpage')">20</a>
+                                        <a class="dropdown-item" href="javascript:;" onclick="searchValue(50, 'perpage')">50</a>
+                                        <a class="dropdown-item" href="javascript:;" onclick="searchValue(100, 'perpage')">100</a>
                                     </div>
                                 </div>
                             </div>

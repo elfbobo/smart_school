@@ -112,14 +112,9 @@ class AppManageController extends BaseController
             }
 
             //服务类别搜索
-            /*if (isset($requestParams['service_type']) && $requestParams['service_type']) {
-                $child = ServiceTypeModel::where('parent_id', $requestParams['service_type'])->pluck('id')->toArray();
-                $serviceTypeIds = [$requestParams['service_type']];
-                if ($child) {
-                    $serviceTypeIds = array_merge($serviceTypeIds, $child);
-                }
-                $query->whereIn('b.service_type_id', $serviceTypeIds);
-            }*/
+            if (isset($requestParams['service_type']) && $requestParams['service_type']) {
+                $query->whereRaw('id in (select app_id from t_app_service_app where service_type_id = ?)', [$requestParams['service_type']]);
+            }
         })
             //->select('a.*', 'c.name as service_name')
             ->orderBy('sort')
@@ -333,7 +328,7 @@ class AppManageController extends BaseController
             'name' => [
                 'required',
                 'max:30',
-                !is_null($id) ? Rule::unique('t_app_list')->ignore($id) : 'unique:t_app_list'
+                //!is_null($id) ? Rule::unique('t_app_list')->ignore($id) : 'unique:t_app_list'
             ],
         ];
 
