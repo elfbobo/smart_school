@@ -14,7 +14,7 @@ class DepartmentModel extends Model
     //
     protected $table = 't_department';
 
-    protected $fillable = ['code', 'name', 'parent_id', 'status', 'category', 'bbdm', 'leader'];
+    protected $fillable = ['code', 'name', 'parent_id', 'status', 'category', 'bbdm', 'leader', 'principal'];
 
     public static function getone($value, $isCode = false)
     {

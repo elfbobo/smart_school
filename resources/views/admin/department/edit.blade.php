@@ -63,6 +63,16 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="">分管校长</label>
+                        <br>
+                        <select name="principal" id="" class="form-control select2" style="width: 100%;">
+                            <option value=""></option>
+                            @foreach($users as $code => $user)
+                                <option value="{{ $code }}" {{ $info->principal==$code?'selected':'' }}>[{{ $code }}]{{ $user }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
                     <div class="form-group">
                         <label for="">备注</label>
