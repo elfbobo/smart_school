@@ -52,7 +52,6 @@
                             <label class="">手机号</label>
                             <input type="text" name="phone" class="form-control"
                                    placeholder="请输手机号"
-                                   minlength="11"
                                    maxlength="11"
                                    value="{{ $info->phone }}"
                                    autocomplete="off"

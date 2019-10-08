@@ -83,7 +83,7 @@ class AppManageController extends BaseController
             })
             ->where(function ($query) use ($requestParams) {
             //应用类型搜索
-            if (isset($requestParams['app_type']) && $requestParams['app_type']) {
+            if (isset($requestParams['app_type']) && strlen($requestParams['app_type'])) {
                 //$field = $this->appTypeValue[$requestParams['app_type']];
                 $query->where('category', $requestParams['app_type']);
             }

@@ -272,11 +272,14 @@ class TeacherController extends BaseController
                 ];
 
                 $data = $reader->get()->toArray();
-                $count = count($data);
+                $count = count($data)-1;
                 $num = 0;
                 if ($data) {
                     $dic = $this->getDic();
                     foreach ($data as $key => $item) {
+                        if ($key == 0) {
+                            continue;
+                        }
                         DB::beginTransaction();
                         try {
                             foreach ($item as $k => $v) {
